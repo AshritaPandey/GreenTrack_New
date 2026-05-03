@@ -1,0 +1,17 @@
+{
+  "test@example.com": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2b$10$7P2NMqPQJmY98Lxz3NgTfuUBpVWqHFUjr95mFjruTqX5s/VugsWAy"
+  },
+  "abc@gmail.com": {
+    "name": "abc",
+    "email": "abc@gmail.com",
+    "password": "$2b$10$ABa.4EBqk6ZeoRFmxJw9suv2SanGGf/V3Ono0XPkOZjUUwx25nCcW"
+  },
+  "abcd@gmail.com": {
+    "name": "Ashrita",
+    "email": "abcd@gmail.com",
+    "password": "$2b$10$ap8eKYJZeR4uulcg/FeD/O/cFNIRXPpcAOIndKa9yiT/JifJ9JGIy"
+  }
+}

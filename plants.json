@@ -1,0 +1,23 @@
+{
+  "Mango": { "soil": "Well-drained alluvial or red soil", "climate": "Tropical to subtropical", "temperature": "24°C – 27°C", "months": "April – September", "watering": "Every 2–3 days" },
+  "Banana": { "soil": "Rich, well-drained loamy soil", "climate": "Tropical", "temperature": "26°C – 30°C", "months": "June – August", "watering": "Daily, especially in summer" },
+  "Guava": { "soil": "Sandy loam", "climate": "Subtropical", "temperature": "23°C – 28°C", "months": "July – August", "watering": "Twice a week" },
+  "Papaya": { "soil": "Loamy, well-drained", "climate": "Tropical", "temperature": "22°C – 26°C", "months": "June – September", "watering": "3 times a week" },
+  "Tomato": { "soil": "Sandy loam", "climate": "Warm, dry", "temperature": "21°C – 24°C", "months": "October – February", "watering": "Every day" },
+  "Rose": { "soil": "Loamy with good drainage", "climate": "Mild and dry", "temperature": "15°C – 26°C", "months": "October – February", "watering": "Every other day" },
+  "Marigold": { "soil": "Various soils, including clay and sandy loam", "climate": "Sunny", "temperature": "18°C – 30°C", "months": "June – October", "watering": "2–3 times a week" },
+  "Chrysanthemum": { "soil": "Sandy loam", "climate": "Cool", "temperature": "15°C – 20°C", "months": "August – October", "watering": "Twice a week" },
+  "Sunflower": { "soil": "Loamy, well-drained", "climate": "Warm and sunny", "temperature": "20°C – 25°C", "months": "February – April", "watering": "Once every 2 days" },
+  "Jasmine": { "soil": "Well-drained rich soil", "climate": "Warm", "temperature": "20°C – 30°C", "months": "June – October", "watering": "Every 2 days" },
+  "Tulsi": { "soil": "Sandy loam with good drainage", "climate": "Warm", "temperature": "20°C – 35°C", "months": "May – July", "watering": "Daily" },
+  "Aloe Vera": { "soil": "Well-drained, sandy soil", "climate": "Hot and dry", "temperature": "20°C – 30°C", "months": "March – June", "watering": "Twice a week" },
+  "Money Plant": { "soil": "Various soils, loamy or clayey", "climate": "Indoor, shaded sunlight", "temperature": "15°C – 30°C", "months": "Year-round", "watering": "Once in 5–7 days" },
+  "Hibiscus": { "soil": "Loamy or clayey and well-drained", "climate": "Tropical", "temperature": "25°C – 32°C", "months": "March – October", "watering": "Every day in summer" },
+  "Mint": { "soil": "Moist, well-drained", "climate": "Cool to warm", "temperature": "18°C – 24°C", "months": "Year-round", "watering": "Keep soil moist" },
+  "Curry Leaves": { "soil": "Well-drained, slightly acidic", "climate": "Tropical", "temperature": "20°C – 30°C", "months": "February – May", "watering": "Moderate, once in 2–3 days" },
+  "Lemon": { "soil": "Sandy loam, well-drained", "climate": "Subtropical", "temperature": "20°C – 28°C", "months": "June – August", "watering": "Twice a week" },
+  "Ginger": { "soil": "Rich, loamy", "climate": "Tropical, humid", "temperature": "25°C – 30°C", "months": "May – June", "watering": "Daily" },
+  "Watermelon": { "soil": "Sandy loam, well-drained", "climate": "Hot and sunny", "temperature": "25°C – 35°C", "months": "April – July", "watering": "Daily in summer" },
+  "Potato": { "soil": "Silty, loamy, and well-drained", "climate": "Cool", "temperature": "15°C – 20°C", "months": "October – February", "watering": "Moderate, every 2-3 days" },
+  "Groundnut": { "soil": "Sandy, red, or loamy soil", "climate": "Tropical", "temperature": "25°C – 32°C", "months": "June – September", "watering": "Regularly but avoid waterlogging" }
+}
