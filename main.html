@@ -1,513 +1,487 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GreenTrack – Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    /* Premium overrides for main.html */
-    body { font-family: 'Inter', sans-serif; background-color: #f4f9f4; }
-    
-    header {
-      background: linear-gradient(135deg, #1b5e20, #2e7d32);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      position: sticky; top: 0; z-index: 100;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenTrack - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #27ae60;
+            --dark: #1e272e;
+            --light: #f5f6fa;
+            --danger: #e74c3c;
+            --glass: rgba(255, 255, 255, 0.95);
+        }
 
-    header h1 { letter-spacing: -0.5px; font-weight: 700; margin-bottom: 0.5rem; }
-    
-    nav { margin-top: 10px; }
-    nav a { 
-      font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;
-      transition: color 0.3s;
-    }
-    nav a:hover { color: #fdd835; text-decoration: none; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #1e272e 0%, #2ecc71 100%);
+            margin: 0;
+            color: var(--dark);
+            min-height: 100vh;
+        }
 
-    .hero {
-      position: relative; background: #000; color: white; padding: 0; overflow: hidden;
-      height: 70vh; min-height: 500px; display: flex; align-items: center; justify-content: center; text-align: center;
-    }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh;
+        }
 
-    .hero::after {
-      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)); z-index: 1;
-    }
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            color: white;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .hero img.banner-img {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      object-fit: cover; margin: 0; border-radius: 0; z-index: 0; opacity: 1;
-      filter: brightness(0.95) contrast(1.05);
-    }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .hero-content {
-      position: relative; z-index: 2; max-width: 900px; padding: 0 40px;
-    }
+        .nav-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+        }
 
-    .hero h2 { 
-      font-size: 4rem; font-weight: 800; margin-bottom: 2rem; 
-      color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.8); 
-      line-height: 1.1;
-    }
-    .hero p { 
-      font-size: 1.5rem; max-width: 700px; margin: 0 auto 3.5rem auto; line-height: 1.6; 
-      color: rgba(255,255,255,0.95); text-shadow: 0 2px 10px rgba(0,0,0,0.6); 
-    }
-    .hero .btn-primary { z-index: 5; position: relative; }
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
 
-    /* Premium interactive cards in Gallery */
-    .gallery-item {
-      overflow: hidden; position: relative; border-radius: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    .gallery-item img {
-      width: 100%; display: block;
-      transition: transform 0.5s ease;
-    }
-    .gallery-item:hover img {
-      transform: scale(1.1);
-    }
-    .gallery-item .gallery-item-info {
-      position: absolute; bottom: 0; left: 0; width: 100%;
-      background: rgba(46, 125, 50, 0.9);
-      color: white; padding: 1.5rem; margin: 0;
-      transform: translateY(100%); transition: transform 0.3s ease;
-    }
-    .gallery-item:hover .gallery-item-info {
-      transform: translateY(0);
-    }
-    .gallery-item-info h4 { color: white !important; margin-bottom: 0.25rem; }
-    .gallery-item-info p { color: rgba(255,255,255,0.9); font-size: 0.85rem; }
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
 
-    /* Plant Selection Guide Section */
-    .plant-guide {
-      padding: 80px 20px;
-      background: white;
-      text-align: center;
-    }
-    .plant-guide h2 { color: #2e7d32; font-size: 2.2rem; margin-bottom: 2rem; }
-    
-    .guide-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fdfdfd;
-      border: 1px solid #e0e0e0;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      display: flex; flex-direction: column; gap: 1.5rem;
-    }
+        /* Main Content */
+        .main-content {
+            padding: 40px;
+            overflow-y: auto;
+            background: var(--light);
+            border-radius: 40px 0 0 0;
+        }
 
-    select {
-      width: 100%; max-width: 400px; margin: 0 auto;
-      padding: 1rem; font-size: 1.1rem; border-radius: 8px;
-      border: 1px solid #ccc; outline: none; background: #fff;
-      cursor: pointer; transition: border-color 0.3s;
-    }
-    select:focus { border-color: #2e7d32; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
 
-    .plant-details {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem; text-align: left;
-      opacity: 0; transition: opacity 0.5s;
-    }
-    .plant-details.active { opacity: 1; }
-    
-    .detail-box {
-      background: #f4f9f4; padding: 1.5rem; border-radius: 12px;
-      border-left: 4px solid #4caf50;
-    }
-    .detail-box h4 { color: #1b5e20; margin-bottom: 0.5rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-    .detail-box span { font-size: 1.1rem; color: #333; font-weight: 500;}
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-    /* Modern Buttons */
-    .btn-primary {
-      display: inline-block;
-      background: #2e7d32; color: white;
-      padding: 12px 24px; border-radius: 30px;
-      text-decoration: none; font-weight: 600; font-size: 1.1rem;
-      transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(46,125,50,0.3);
-      border: none; cursor: pointer; margin-top: 1rem;
-    }
-    .btn-primary:hover {
-      background: #1b5e20; transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(27,94,32,0.4);
-    }
-  </style>
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Scan Section */
+        .scan-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .upload-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 2px dashed #ddd;
+            transition: 0.3s;
+        }
+
+        .upload-card.dragover {
+            border-color: var(--primary);
+            background: #f0fff4;
+        }
+
+        .btn-upload {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-upload:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Recommendation Section */
+        .recommendation-card {
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        .plant-list {
+            margin-top: 20px;
+        }
+
+        .plant-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .match-score {
+            background: #e8f8f0;
+            color: var(--primary);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Diagnostic Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 35px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-left {
+            background: #f9f9f9;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-right {
+            padding: 40px;
+        }
+
+        .result-img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-critical { background: #feeaea; color: #e74c3c; }
+        .status-healthy { background: #e8f8f0; color: #2ecc71; }
+
+        .solution-list {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .solution-list li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        #loadingOverlay {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Form Controls */
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <nav>
-        <h1>🌱 GreenTrack</h1>
-        <div class="nav-links">
-          <a href="#home" class="active">Home</a>
-          <a href="#guide">Plant Guide</a>
-          <a href="#gallery">Gallery</a>
-          <a href="tracker.html">Tracker & Logs</a>
-          <a href="index.html" onclick="localStorage.removeItem('user')">Logout</a>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">🌿 GreenTrack</div>
+            <nav>
+                <a href="#" class="nav-item active">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="tracker.html" class="nav-item">
+                    <span>📝</span> Activity Tracker
+                </a>
+                <a href="#" class="nav-item">
+                    <span>🌱</span> My Garden
+                </a>
+                <a href="#" class="nav-item">
+                    <span>⚙️</span> Settings
+                </a>
+            </nav>
+            <div style="margin-top: 200px">
+                <a href="index.html" class="nav-item" style="color: #ff7675">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
         </div>
-      </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 style="margin: 0">Agricultural Intelligence</h1>
+                    <p style="color: #666">Welcome back, <span id="userName">Explorer</span></p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar" id="userInitial">A</div>
+                    <div id="userEmail" style="font-size: 0.9rem; color: #666"></div>
+                </div>
+            </div>
+
+            <div class="scan-container">
+                <div class="upload-card" id="dropZone">
+                    <div id="defaultPrompt">
+                        <div style="font-size: 3rem; margin-bottom: 20px">📸</div>
+                        <h2>Scan Your Specimen</h2>
+                        <p>Drag & drop or click to upload a photo of your plant for AI analysis.</p>
+                        
+                        <div style="max-width: 300px; margin: 30px auto; text-align: left;">
+                            <label>Plant Type</label>
+                            <select id="plantType">
+                                <option value="Mango">Mango</option>
+                                <option value="Tomato">Tomato</option>
+                                <option value="Potato">Potato</option>
+                                <option value="Other">Other/Unknown</option>
+                            </select>
+                            
+                            <label>Analysis Focus</label>
+                            <select id="analysisPart">
+                                <option value="Leaf">Leaf/Foliage</option>
+                                <option value="Fruit">Fruit/Vegetable</option>
+                                <option value="Stem">Stem/Trunk</option>
+                            </select>
+                        </div>
+
+                        <input type="file" id="fileInput" hidden accept="image/*">
+                        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">Analyze Now</button>
+                    </div>
+
+                    <div id="loadingOverlay">
+                        <div class="spinner"></div>
+                        <h3>AI is analyzing cellular patterns...</h3>
+                        <p>Detecting pathogens and ecosystem stress signals.</p>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <h3>Smart Recommendations</h3>
+                    <p style="font-size: 0.9rem; color: #666">Based on local ecosystem data.</p>
+                    <div class="plant-list" id="recommendationList">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <section class="hero" style="height: 80vh; min-height: 600px; padding: 4rem 1rem;">
-    <img src="https://images.unsplash.com/photo-1453904300235-0f2f60b15b5d?w=1200" alt="GreenTrack Banner" class="banner-img">
-    <div class="container hero-content" style="text-align: center;">
-      <div class="reveal">
-        <h2 style="font-size: clamp(3rem, 10vw, 5rem); line-height: 1.1; margin-bottom: 2rem;">Tracking Growth,<br>One Sapling at a Time</h2>
-        <p style="font-size: 1.5rem; max-width: 700px; margin: 0 auto 3rem auto; opacity: 0.9;">Document and celebrate the journey of every sapling you plant and care for.</p>
-        <a href="tracker.html" class="btn-primary" style="display: inline-block; padding: 1rem 3rem; font-size: 1.2rem;">Go to Tracker</a>
-      </div>
+    <!-- Diagnostic Modal -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-left">
+                <img src="" id="uploadedImage" class="result-img">
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="color: #666; font-size: 0.9rem;">Analysis Confidence</p>
+                    <h3 id="confidenceText">0%</h3>
+                </div>
+            </div>
+            <div class="modal-right">
+                <span id="statusBadge" class="status-badge">Healthy</span>
+                <h2 id="diseaseName" style="margin: 0 0 10px 0">No Pathogens Found</h2>
+                <p id="affectedPart" style="color: #666; margin-bottom: 30px">Plant Foliage</p>
+                
+                <div id="solutionSection">
+                    <h4 style="margin-bottom: 10px">Recommended Actions:</h4>
+                    <ul class="solution-list" id="solutionList">
+                        <li>Specimen shows optimal health.</li>
+                    </ul>
+                </div>
+
+                <button class="btn-upload" style="width: 100%" onclick="closeModal()">Complete Session</button>
+            </div>
+        </div>
     </div>
-  </section>
 
-  <!-- SMART RECOMMENDER SECTION -->
-  <section class="container" style="padding: 6rem 1.5rem;">
-    <div class="glass" style="padding: 4rem; border-radius: 3rem; box-shadow: 0 40px 100px rgba(0,0,0,0.08); background: #ffffff; border: 1px solid #f0f0f0;">
-      <div style="text-align: center; margin-bottom: 4rem;">
-        <h3 style="font-size: 2.5rem; color: var(--primary); font-weight: 800; margin-bottom: 1rem;">🌍 Smart Climate Recommender</h3>
-        <p id="location-status" style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 2rem;">Detecting your local environment for the best plant matches...</p>
-        <button id="detect-btn" class="btn-primary" style="margin: 0; padding: 1rem 3rem; font-size: 1.1rem;">📍 Check My Location</button>
-      </div>
-
-      <div id="recommendation-results">
-        <div class="stats-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-          <div class="stat-card" style="border-left: 4px solid var(--primary); background: #f0fdf4;">
-            <div class="stat-label">EXACT AREA</div>
-            <div id="area-name" class="stat-value" style="font-size: 1.3rem; color: var(--primary);">Detecting...</div>
-          </div>
-          <div class="stat-card" style="border-left: 4px solid #b45309; background: #fffbeb;">
-            <div class="stat-label">LOCAL SOIL</div>
-            <div id="soil-type-val" class="stat-value" style="font-size: 1.2rem; color: #92400e;">Detecting...</div>
-            <div id="soil-nutrients-header" style="font-size: 0.75rem; color: #b45309; margin-top: 0.75rem; font-weight: 700; border-top: 1px solid rgba(180, 83, 9, 0.1); padding-top: 0.5rem;">Micro nutrients found in soil:</div>
-            <div id="soil-nutrients" style="font-size: 0.75rem; color: #b45309; margin-top: 0.25rem; font-weight: 500;">Please sync your location...</div>
-          </div>
-          <div class="stat-card" style="border-left: 4px solid #f59e0b; background: #fff7ed;">
-            <div class="stat-label">TEMPERATURE</div>
-            <div id="est-temp" class="stat-value" style="font-size: 1.5rem; color: #b45309;">--°C</div>
-          </div>
-          <div class="stat-card" style="border-left: 4px solid #8b5cf6; background: #f5f3ff;">
-            <div class="stat-label">RAIN & WATERING</div>
-            <div id="rain-val" class="stat-value" style="font-size: 1.1rem; color: #5b21b6;">Detecting...</div>
-            <div id="watering-text" style="font-size: 0.8rem; color: #1e3a8a; margin-top: 0.5rem; line-height: 1.3;">Sync GPS...</div>
-          </div>
-        </div>
-        
-        <h4 style="margin-bottom: 2.5rem; font-weight: 800; color: var(--primary); font-size: 1.8rem; text-align: center;">Precision Ecosystem Match: Best for Your Area & Soil</h4>
-        <div id="rec-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; justify-content: center;">
-          <p style="color: var(--text-sub);">Sync location for precision analysis...</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="home" class="home-section" style="padding: 8rem 0; background: #fdfdfd; border-top: 1px solid #f0f0f0;">
-    <div class="container reveal">
-      <h2 class="section-title" style="font-size: 3rem; margin-bottom: 2rem;">Welcome to GreenTrack</h2>
-      <p class="intro-text" style="text-align: center; max-width: 900px; margin: 0 auto 6rem auto; font-size: 1.3rem; line-height: 1.8; color: var(--text-sub);">GreenTrack is your digital companion in nurturing and tracking saplings. Record progress, share updates, and inspire others to join the green movement.</p>
-      
-      <div class="gallery-grid">
-        <div class="gallery-item reveal">
-          <div class="gallery-item-info">
-            <h3>🌱 Record Growth</h3>
-            <p>Log height, date, and notes to see your sapling thrive over time.</p>
-          </div>
-        </div>
-        <div class="gallery-item reveal">
-          <div class="gallery-item-info">
-            <h3>📸 Document Journey</h3>
-            <p>Upload weekly photos to create a beautiful visual history.</p>
-          </div>
-        </div>
-        <div class="gallery-item reveal">
-          <div class="gallery-item-info">
-            <h3>🩺 Health Check</h3>
-            <p>Get insights into your plant's health with our upcoming analysis tool.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Interactive Plant Guide Section -->
-  <section id="guide" class="plant-guide" style="padding: 6rem 0; background: white;">
-    <div class="container reveal">
-      <h2 class="section-title">Plant Selection & Guidance 🌿</h2>
-      <div class="glass" style="max-width: 800px; margin: 0 auto; padding: 3rem; border-radius: 2rem;">
-        <p style="text-align: center; margin-bottom: 2rem; color: var(--text-sub);">Select a plant to discover its ideal growing conditions. You can track any of these in your dashboard.</p>
-        <div style="display: flex; justify-content: center; margin-bottom: 3rem;">
-          <select id="plant-select" style="max-width: 400px; border-radius: 9999px;">
-            <option value="">-- Choose a Plant --</option>
-          </select>
-        </div>
-        
-        <div class="plant-details" id="plant-details" style="display: none; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; transition: all 0.3s ease;">
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Soil Type</h4>
-            <span id="soil" style="font-weight: 600; color: var(--primary);">-</span>
-          </div>
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Climate</h4>
-            <span id="climate" style="font-weight: 600; color: var(--primary);">-</span>
-          </div>
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Temp</h4>
-            <span id="temperature" style="font-weight: 600; color: var(--primary);">-</span>
-          </div>
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Months</h4>
-            <span id="months" style="font-weight: 600; color: var(--primary);">-</span>
-          </div>
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Watering</h4>
-            <span id="watering" style="font-weight: 600; color: var(--primary);">-</span>
-          </div>
-          <div class="detail-box" style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-top: 4px solid var(--primary-light);">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 0.5rem;">Fertilizer Prescription</h4>
-            <span id="fertilizer-rec" style="font-weight: 600; color: var(--primary); font-size: 0.9rem;">Select a plant to see soil-specific needs.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="gallery" class="gallery-section">
-    <div class="container reveal">
-      <h2 class="section-title">Community Journey 📸</h2>
-      <p style="text-align: center; margin-bottom: 3rem; color: var(--text-sub);">Witness our saplings thrive through every stage of growth.</p>
-      <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-        <div class="gallery-item">
-          <img src="images/week 1.jpeg" alt="Week 1">
-          <div class="gallery-item-info">
-            <h4>Phase 1</h4>
-            <p>Seedling Stage: Freshly planted and full of hope.</p>
-          </div>
-        </div>
-        <div class="gallery-item">
-          <img src="images/week 2.jpeg" alt="Week 2">
-          <div class="gallery-item-info">
-            <h4>Phase 2</h4>
-            <p>Active Growth: Establishing strong roots and first stems.</p>
-          </div>
-        </div>
-        <div class="gallery-item">
-          <img src="images/week 3.jpeg" alt="Week 3">
-          <div class="gallery-item-info">
-            <h4>Phase 3</h4>
-            <p>Green Foliage: Lush leaves appearing as the plant strengthens.</p>
-          </div>
-        </div>
-        <div class="gallery-item">
-          <img src="images/week 4.jpeg" alt="Week 4">
-          <div class="gallery-item-info">
-            <h4>Phase 4</h4>
-            <p>Thriving Sapling: Healthy, vibrant and ready for the world.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 GreenTrack | Made by Ashrita 💚</p>
-    </div>
-  </footer>
-
-  <script>
-    const user = JSON.parse(localStorage.getItem("user"));
-    if(!user) { window.location.href = "index.html"; }
-
-    // Scroll Animation Logic
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+    <script>
+        // Check Auth
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'index.html';
         }
-      });
-    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userInitial').textContent = user.name[0];
+        document.getElementById('userEmail').textContent = user.email;
 
-    // Detect Location and Recommend
-    const monthsArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const detectBtn = document.getElementById('detect-btn');
-    const statusText = document.getElementById('location-status');
-    const resultsArea = document.getElementById('recommendation-results');
+        const API_URL = "/api";
 
-    if (detectBtn) {
-      detectBtn.onclick = () => {
-        statusText.textContent = "📍 Synchronizing GPS...";
-        const areaName = document.getElementById('area-name');
-        const soilVal = document.getElementById('soil-type-val');
-        const rainVal = document.getElementById('rain-val');
-        const waterText = document.getElementById('watering-text');
-        const tempVal = document.getElementById('est-temp');
+        // Handle File Selection
+        const fileInput = document.getElementById('fileInput');
+        fileInput.onchange = (e) => {
+            if (e.target.files.length > 0) {
+                uploadImage(e.target.files[0]);
+            }
+        };
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(async (pos) => {
-            const { latitude, longitude } = pos.coords;
-            
+        async function uploadImage(file) {
+            const plant = document.getElementById('plantType').value;
+            const part = document.getElementById('analysisPart').value;
+
+            document.getElementById('defaultPrompt').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('plant', plant);
+            formData.append('part', part);
+            formData.append('email', user.email);
+
             try {
-              // 1. Hyper-Local Reverse Geocoding
-              const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-              const geoData = await geoRes.json();
-              const addr = geoData.address;
-              const area = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || addr.town || addr.city || "Chennai";
-              areaName.innerText = area;
-              statusText.textContent = `📍 Area Identified: ${area}`;
-
-              // 2. Live Weather API (No Key Required)
-              const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=precipitation_probability`);
-              const weatherData = await weatherRes.json();
-              const temp = Math.round(weatherData.current_weather.temperature);
-              const rainProb = weatherData.hourly.precipitation_probability[0];
-              
-              tempVal.innerText = `${temp}°C`;
-              rainVal.innerText = rainProb > 30 ? `Rain Alert (${rainProb}%)` : `Clear (${rainProb}%)`;
-
-              // 3. Precision Soil Mapping & Micronutrients
-              let soilType = "Loamy Soil";
-              let nutrients = "Nitrogen, Phosphorus, Potash, Calcium, Magnesium";
-              if (latitude > 12.8 && latitude < 13.2) {
-                soilType = "Coastal Alluvial Clay";
-                nutrients = "High Potash, Low Nitrogen & Phosphorus, Rich in Iron";
-              } else if (latitude > 18 && latitude < 20) {
-                soilType = "Black Cotton Soil";
-                nutrients = "High Calcium & Magnesium, Low Nitrogen, Rich in Lime";
-              } else if (latitude > 28) {
-                soilType = "Alluvial Sandy Loam";
-                nutrients = "High Organic Matter, Low Zinc, High Potash";
-              } else {
-                soilType = "Ferruginous Red Soil";
-                nutrients = "High Iron & Aluminum, Low Nitrogen, Low Zinc";
-              }
-              soilVal.innerText = soilType;
-              document.getElementById('soil-nutrients-header').innerText = `Micro nutrients found in ${soilType}:`;
-              document.getElementById('soil-nutrients').innerText = nutrients;
-
-              // 4. Expert Watering Plan
-              if (rainProb > 40) {
-                waterText.innerText = "Rain imminent. Delay watering to avoid over-saturation.";
-              } else if (temp > 33) {
-                waterText.innerText = "High evaporation! Deep water (2.5L) early morning.";
-              } else {
-                waterText.innerText = "Ideal climate. Standard hydration (750ml) is perfect.";
-              }
-
-              fetchRecommendations(monthsArr[new Date().getMonth()], temp, soilType, area, rainProb, nutrients);
-
-            } catch(e) {
-              console.error(e);
-              statusText.textContent = "⚠️ Sync Interrupted. Using regional defaults.";
-              areaName.innerText = "Chennai Metro";
-              soilVal.innerText = "Red Soil";
-              tempVal.innerText = "28°C";
-              rainVal.innerText = "No Rain Forecast";
+                const response = await fetch(`${API_URL}/predict-disease`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                showResults(result, URL.createObjectURL(file));
+            } catch (error) {
+                alert('Analysis failed. Please check connection.');
+                document.getElementById('defaultPrompt').style.display = 'block';
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
-          }, (err) => {
-            statusText.textContent = "⚠️ GPS Permission Denied.";
-            areaName.innerText = "Chennai";
-            soilVal.innerText = "Regional Loam";
-          });
         }
-      };
-    }
 
-    async function fetchRecommendations(month, temp, soil, area, rain, nutrients) {
-      const recList = document.getElementById('rec-list');
-      recList.innerHTML = "<p>Running 5-Point Ecosystem Analysis...</p>";
-      
-      try {
-        const res = await fetch('/api/recommend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ month, current_temp: temp, soil_type: soil, area, rain_prob: rain, nutrients })
-        });
-        
-        if (res.ok) {
-          const plants = await res.json();
-          recList.innerHTML = "";
-          plants.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'plant-card';
-            card.innerHTML = `
-              <div style="font-size: 0.65rem; font-weight: 800; color: #059669; margin-bottom: 0.5rem; text-transform: uppercase;">${p.match_reason || 'Perfect Match'}</div>
-              <div style="font-size: 2rem; margin-bottom: 0.5rem;">${p.icon || '🌱'}</div>
-              <div style="font-weight: 700; color: var(--primary);">${p.name}</div>
-              <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 0.5rem;">${p.difficulty || 'Easy'} • ${p.sunlight || 'Full Sun'}</div>
-            `;
-            recList.appendChild(card);
-          });
-        }
-      } catch (err) { recList.innerHTML = "<p>Service busy. Refreshing...</p>"; }
-    }
-
-    // CSS for animations
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-      .reveal.visible { opacity: 1; transform: translateY(0); }
-    `;
-    document.head.appendChild(style);
-
-    // Fetch dynamic plant guidance from backend
-    document.addEventListener("DOMContentLoaded", async () => {
-      const select = document.getElementById("plant-select");
-      const detailsGrid = document.getElementById("plant-details");
-
-      try {
-        // Auto-detect API URL based on environment
-        const API_URL = window.location.hostname === "localhost" ? "http://localhost:3000/api" : "/api";
-        const response = await fetch(`${API_URL}/plants`);
-        const plantData = await response.json();
-        
-        Object.keys(plantData).forEach(plantName => {
-          const option = document.createElement("option");
-          option.value = plantName;
-          option.textContent = plantName;
-          select.appendChild(option);
-        });
-
-        select.addEventListener("change", (e) => {
-          const plant = plantData[e.target.value];
-          const soilElem = document.getElementById('soil-type-val');
-          const detectedSoil = soilElem ? soilElem.innerText : "Loamy Soil";
-          
-          if (plant) {
-            document.getElementById("soil").textContent = plant.soil || "-";
-            document.getElementById("climate").textContent = plant.climate || "-";
-            document.getElementById("temperature").textContent = plant.temperature || "-";
-            document.getElementById("months").textContent = plant.months || "-";
-            document.getElementById("watering").textContent = plant.watering || "-";
+        function showResults(data, imgUrl) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('defaultPrompt').style.display = 'block';
             
-            // Logic for Fertilizer Prescription based on Soil + Plant
-            let fert = "Apply balanced Nitrogen-Phosphorus-Potash (NPK 19:19:19) every 15 days.";
-            if (detectedSoil.includes("Coastal")) {
-              fert = "Your soil is rich in Potash. Add Nitrogen-rich Urea (50g) and Boron (2g) to help the plant grow stronger stems and fruits.";
-            } else if (detectedSoil.includes("Black")) {
-              fert = "Your soil is Calcium-rich. Add Magnesium Sulfate (10g) and Organic Compost to prevent leaves from turning yellow.";
-            } else if (detectedSoil.includes("Red")) {
-              fert = "Your soil is low in Phosphorus. Add Bone Meal or Single Super Phosphate (100g) plus Zinc Sulfate for better root health.";
-            } else if (detectedSoil.includes("Alluvial")) {
-              fert = "Your soil is generally fertile but lacks Zinc. Add 5g Zinc per plant and use liquid seaweed extract for best results.";
+            const modal = document.getElementById('resultModal');
+            document.getElementById('uploadedImage').src = imgUrl;
+            document.getElementById('confidenceText').textContent = (data.confidence_score * 100).toFixed(1) + '%';
+            
+            const badge = document.getElementById('statusBadge');
+            badge.className = 'status-badge ' + (data.health_status.includes('Healthy') ? 'status-healthy' : 'status-critical');
+            badge.textContent = data.health_status;
+            
+            document.getElementById('diseaseName').textContent = data.disease_id;
+            document.getElementById('affectedPart').textContent = 'Specimen Focus: ' + (data.affected_part || 'Foliage');
+            
+            const solList = document.getElementById('solutionList');
+            solList.innerHTML = data.solution_steps.map(s => `<li>${s}</li>`).join('');
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            location.reload(); // Refresh to update tracker if needed
+        }
+
+        // Load Recommendations
+        async function loadRecommendations() {
+            try {
+                const response = await fetch(`${API_URL}/recommend-plants`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        month: 'May',
+                        current_temp: 32,
+                        soil_type: 'Loamy'
+                    })
+                });
+                const data = await response.json();
+                
+                const list = document.getElementById('recommendationList');
+                list.innerHTML = data.recommendations.map(r => `
+                    <div class="plant-item">
+                        <div style="flex-grow: 1">
+                            <div style="font-weight: 600">${r.name}</div>
+                            <div style="font-size: 0.8rem; color: #666">${r.reason}</div>
+                        </div>
+                        <div class="match-score">${r.match}% Match</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Rec failed');
             }
-            
-            const fertRec = document.getElementById("fertilizer-rec");
-            if (fertRec) fertRec.textContent = fert;
-            
-            detailsGrid.style.display = "grid";
-            setTimeout(() => detailsGrid.style.opacity = "1", 10);
-          } else {
-            detailsGrid.style.display = "none";
-          }
-        });
-      } catch (err) {
-        console.error("Could not load plants from API", err);
-      }
-    });
-  </script>
+        }
+
+        loadRecommendations();
+    </script>
 </body>
 </html>
