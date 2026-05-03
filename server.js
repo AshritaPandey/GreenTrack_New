@@ -266,6 +266,11 @@ app.post("/api/recommend", async (req, res) => {
 app.use("/uploads", express.static(uploadDir));
 app.use(express.static(__dirname));
 
+// Explicitly serve index.html as the root
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
