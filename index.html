@@ -8,259 +8,145 @@
   <style>
     /* CSS Variables & Global Reset for Premium Login */
     :root {
-      --primary-color: #064e3b;
-      --secondary-color: #059669;
-      --accent-color: #f59e0b;
-      --text-color: #ffffff;
-      --glass-bg: rgba(255, 255, 255, 0.1);
+      --primary-color: #27ae60;
+      --secondary-color: #2ecc71;
+      --accent-color: #f1c40f;
+      --error-color: #e74c3c;
+      --bg-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      --glass-bg: rgba(255, 255, 255, 0.15);
       --glass-border: rgba(255, 255, 255, 0.2);
     }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
-      /* Dynamic Gradient Background */
-      background: linear-gradient(-45deg, #1b5e20, #2e7d32, #4caf50, #81c784);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      background: var(--bg-gradient);
       height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      color: var(--text-color);
+      justify-content: center;
       overflow: hidden;
     }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Floating Leaves Effect Canvas */
-    .shapes {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      z-index: 1;
-    }
-    .shape {
-      position: absolute;
-      display: block;
-      list-style: none;
-      width: 20px;
-      height: 20px;
-      background: rgba(255, 255, 255, 0.2);
-      animation: float 25s linear infinite;
-      bottom: -150px;
-      border-radius: 50% 0 50% 50%; /* Leaf shape */
-    }
-    .shape:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
-    .shape:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
-    .shape:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
-    .shape:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
-    .shape:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
-    .shape:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
-    .shape:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
-    .shape:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
-    .shape:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
-    .shape:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
-
-    @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
-    }
-
-    /* Glassmorphism Auth Card */
+    /* Glass Container */
     .auth-container {
-      position: relative;
-      z-index: 2;
       background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(15px);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
+      padding: 3rem;
+      border-radius: 2rem;
       width: 100%;
       max-width: 450px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       text-align: center;
-      transition: transform 0.3s ease;
-    }
-    
-    .auth-container:hover {
-      transform: translateY(-5px);
+      color: white;
+      animation: slideUp 0.6s ease-out;
     }
 
-    .header-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      animation: bounce 2s infinite ease-in-out;
-      display: inline-block;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
+    .logo-section { margin-bottom: 2rem; }
+    .logo-section h1 { font-size: 2.5rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
+    .logo-section p { font-weight: 300; opacity: 0.9; }
 
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
-    }
-
-    p.subtitle {
-      font-size: 0.95rem;
-      font-weight: 300;
-      margin-bottom: 2.5rem;
-      opacity: 0.85;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    .input-group {
-      position: relative;
-      width: 100%;
-    }
-
+    /* Forms */
+    .form-group { position: relative; margin-bottom: 1.5rem; }
     input {
       width: 100%;
-      padding: 1rem 1.2rem;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      font-size: 1rem;
+      padding: 1.2rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid transparent;
+      border-radius: 1rem;
       color: white;
-      outline: none;
-      transition: all 0.3s ease;
+      font-size: 1rem;
+      transition: all 0.3s;
     }
-
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-      font-weight: 300;
-    }
-
+    input::placeholder { color: rgba(255, 255, 255, 0.6); }
     input:focus {
-      background: rgba(255, 255, 255, 0.25);
-      border-color: white;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      outline: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
     }
 
     button {
+      width: 100%;
+      padding: 1.2rem;
       background: var(--accent-color);
-      color: #1b5e20;
+      color: #2c3e50;
       border: none;
-      padding: 1rem;
+      border-radius: 1rem;
       font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 12px;
+      font-weight: 700;
       cursor: pointer;
-      margin-top: 0.5rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(253, 216, 53, 0.4);
+      transition: all 0.3s;
+      box-shadow: 0 10px 20px -5px rgba(241, 196, 15, 0.4);
     }
+    button:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(241, 196, 15, 0.5); }
+    button:active { transform: translateY(0); }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(253, 216, 53, 0.6);
-      background: #ffee58;
-    }
-    
-    button:active {
-      transform: translateY(1px);
-    }
+    .switch-mode { margin-top: 1.5rem; font-size: 0.9rem; }
+    .switch-mode a { color: var(--accent-color); text-decoration: none; font-weight: 600; cursor: pointer; }
 
-    .toggle-text {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-      font-weight: 300;
-    }
-
-    .toggle-text a {
-      color: var(--accent-color);
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: opacity 0.3s;
-    }
-
-    .toggle-text a:hover {
-      opacity: 0.8;
-      text-decoration: underline;
-    }
-
-    /* Notification Area */
+    /* Notification */
     #notification {
-      display: none;
-      background: rgba(244, 67, 54, 0.8);
+      position: fixed;
+      top: 2rem;
+      padding: 1rem 2.5rem;
+      border-radius: 1rem;
       color: white;
-      padding: 0.8rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
+      font-weight: 600;
+      transform: translateY(-150%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
     }
+    #notification.show { transform: translateY(0); }
+    .error-bg { background: var(--error-color); }
+    .success-bg { background: var(--primary-color); }
   </style>
 </head>
 <body>
-
-  <!-- Floating Background Elements -->
-  <ul class="shapes">
-    <li class="shape"></li><li class="shape"></li><li class="shape"></li>
-    <li class="shape"></li><li class="shape"></li><li class="shape"></li>
-    <li class="shape"></li><li class="shape"></li><li class="shape"></li>
-    <li class="shape"></li>
-  </ul>
+  <div id="notification"></div>
 
   <div class="auth-container">
-    <span class="header-icon">🌱</span>
-    <h1 id="formTitle">GreenTrack</h1>
-    <p class="subtitle" id="formSubtitle">Nurturing nature, together.</p>
+    <div class="logo-section">
+      <img src="https://cdn-icons-png.flaticon.com/512/188/188333.png" width="60" alt="Logo">
+      <h1>GreenTrack</h1>
+      <p>Nurturing nature, together.</p>
+    </div>
 
-    <div id="notification"></div>
+    <!-- Login Form -->
+    <div id="loginForm">
+      <div class="form-group">
+        <input type="email" id="loginEmail" placeholder="Email Address">
+      </div>
+      <div class="form-group">
+        <input type="password" id="loginPass" placeholder="Password">
+      </div>
+      <button onclick="handleLogin()">Login</button>
+      <div class="switch-mode">
+        New here? <a onclick="toggleForm('signup')">Create an account</a>
+      </div>
+    </div>
 
-    <!-- LOGIN FORM -->
-    <form id="loginForm">
-      <div class="input-group">
-        <input type="email" name="email" placeholder="Email Address" required />
+    <!-- Signup Form -->
+    <div id="signupForm" style="display: none;">
+      <div class="form-group">
+        <input type="text" id="signupName" placeholder="Full Name">
       </div>
-      <div class="input-group">
-        <input type="password" name="password" placeholder="Password" required />
+      <div class="form-group">
+        <input type="email" id="signupEmail" placeholder="Email Address">
       </div>
-      <button type="submit" id="loginBtn">Login</button>
-    </form>
-
-    <!-- SIGNUP FORM -->
-    <form id="signupForm" style="display: none;">
-      <div class="input-group">
-        <input type="text" name="name" placeholder="Full Name" required />
+      <div class="form-group">
+        <input type="password" id="signupPass" placeholder="Password">
       </div>
-      <div class="input-group">
-        <input type="email" name="email" placeholder="Email Address" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address." />
+      <button onclick="handleSignup()">Join Community</button>
+      <div class="switch-mode">
+        Already a member? <a onclick="toggleForm('login')">Login instead</a>
       </div>
-      <div class="input-group">
-        <input type="password" name="password" placeholder="Create Password" required minlength="6" />
-      </div>
-      <div class="input-group">
-        <input type="password" name="confirmPassword" placeholder="Re-enter Password" required minlength="6" />
-      </div>
-      <button type="submit" id="signupBtn">Sign Up</button>
-      <button type="button" style="background: #ffffff; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #ddd;" onclick="showNotification('Google Sign Up is coming soon!', false)">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20"/>
-        Sign up with Google
-      </button>
-    </form>
-
-    <p class="toggle-text" id="toggleText">
-      New here? <a onclick="toggleForm()">Create an account</a>
-    </p>
+    </div>
   </div>
 
   <script>
@@ -268,93 +154,67 @@
 
     function showNotification(message, isError = true) {
       const notif = document.getElementById('notification');
-      notif.style.display = 'block';
       notif.textContent = message;
-      notif.style.background = isError ? 'rgba(244, 67, 54, 0.8)' : 'rgba(76, 175, 80, 0.8)';
-      setTimeout(() => { notif.style.display = 'none'; }, 4000);
+      notif.className = isError ? 'error-bg show' : 'success-bg show';
+      setTimeout(() => notif.classList.remove('show'), 3000);
     }
 
-    function toggleForm() {
-      const loginForm = document.getElementById('loginForm');
-      const signupForm = document.getElementById('signupForm');
-      const toggleText = document.getElementById('toggleText');
-      const formTitle = document.getElementById('formTitle');
-      const formSubtitle = document.getElementById('formSubtitle');
-
-      if (signupForm.style.display === 'none') {
-        loginForm.style.display = 'none';
-        signupForm.style.display = 'flex';
-        formTitle.textContent = 'Join Us 🌿';
-        formSubtitle.textContent = 'Start your journey to a greener world.';
-        toggleText.innerHTML = 'Already have an account? <a onclick="toggleForm()">Login here</a>';
-      } else {
-        signupForm.style.display = 'none';
-        loginForm.style.display = 'flex';
-        formTitle.textContent = 'GreenTrack';
-        formSubtitle.textContent = 'Nurturing nature, together.';
-        toggleText.innerHTML = 'New here? <a onclick="toggleForm()">Create an account</a>';
-      }
+    function toggleForm(mode) {
+      document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('signupForm').style.display = mode === 'signup' ? 'block' : 'none';
     }
 
-    async function handleAuth(event, endpoint, body) {
-      event.preventDefault();
-      const btn = event.target.querySelector('button');
-      const originalText = btn.textContent;
-      btn.textContent = "Processing...";
-      btn.disabled = true;
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPass').value;
+
+      if (!email || !password) return showNotification("Fill in all fields");
 
       try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
         });
+
         const data = await response.json();
-        
         if (response.ok) {
-          showNotification("Success! Redirecting...", false);
-          localStorage.setItem("user", JSON.stringify(data.user));
-          setTimeout(() => {
-            window.location.href = "main.html";
-          }, 800);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showNotification("Login successful!", false);
+          setTimeout(() => window.location.href = 'main.html', 1000);
         } else {
-          showNotification(data.error || "Authentication failed");
+          showNotification(data.error || "Login failed");
         }
       } catch (err) {
         showNotification("Server error. Ensure backend is running.");
-        console.error(err);
-      } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
       }
     }
 
-    document.getElementById("signupForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.email.value)) {
-        showNotification("Please enter a valid email address.");
-        return;
-      }
-      if (this.password.value !== this.confirmPassword.value) {
-        showNotification("Passwords do not match!");
-        return;
-      }
-      const body = {
-        name: this.name.value,
-        email: this.email.value,
-        password: this.password.value
-      };
-      handleAuth(e, "/signup", body);
-    });
+    async function handleSignup() {
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPass').value;
 
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      const body = {
-        email: this.email.value,
-        password: this.password.value
-      };
-      handleAuth(e, "/login", body);
-    });
+      if (!name || !email || !password) return showNotification("Fill in all fields");
+
+      try {
+        const response = await fetch(`${API_URL}/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          showNotification("Account created! You can now login.", false);
+          toggleForm('login');
+        } else {
+          showNotification(data.error || "Signup failed");
+        }
+      } catch (err) {
+        showNotification("Server error.");
+      }
+    }
   </script>
 </body>
 </html>

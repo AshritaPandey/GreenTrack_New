@@ -3,485 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenTrack - AI Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>GreenTrack - Agricultural Intelligence</title>
     <style>
-        :root {
-            --primary: #2ecc71;
-            --secondary: #27ae60;
-            --dark: #1e272e;
-            --light: #f5f6fa;
-            --danger: #e74c3c;
-            --glass: rgba(255, 255, 255, 0.95);
-        }
-
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #1e272e 0%, #2ecc71 100%);
+            font-family: Arial, sans-serif;
+            background-color: #f0fdf4;
             margin: 0;
-            color: var(--dark);
-            min-height: 100vh;
+            padding: 0;
         }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 30px;
+        header {
+            background-color: #166534;
             color: white;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-item {
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 40px;
-            overflow-y: auto;
-            background: var(--light);
-            border-radius: 40px 0 0 0;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        /* Scan Section */
-        .scan-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 30px;
-        }
-
-        .upload-card {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            padding: 20px;
             text-align: center;
-            border: 2px dashed #ddd;
-            transition: 0.3s;
         }
-
-        .upload-card.dragover {
-            border-color: var(--primary);
-            background: #f0fff4;
-        }
-
-        .btn-upload {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
-        }
-
-        .btn-upload:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-        }
-
-        /* Recommendation Section */
-        .recommendation-card {
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
             background: white;
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .plant-list {
-            margin-top: 20px;
-        }
-
-        .plant-item {
+        .nav {
             display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .match-score {
-            background: #e8f8f0;
-            color: var(--primary);
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        /* Diagnostic Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
             justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            z-index: 1000;
+            gap: 20px;
+            margin-bottom: 30px;
         }
-
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 800px;
-            border-radius: 35px;
+        .nav a {
+            text-decoration: none;
+            color: #166534;
+            font-weight: bold;
+        }
+        .scan-section {
+            text-align: center;
+            padding: 40px;
+            border: 2px dashed #166534;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background-color: #166534;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .results {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            gap: 20px;
         }
-
-        .modal-left {
-            background: #f9f9f9;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-right {
-            padding: 40px;
-        }
-
-        .result-img {
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .status-critical { background: #feeaea; color: #e74c3c; }
-        .status-healthy { background: #e8f8f0; color: #2ecc71; }
-
-        .solution-list {
-            margin: 20px 0;
-            padding-left: 20px;
-        }
-
-        .solution-list li {
-            margin-bottom: 10px;
-            color: #555;
-        }
-
-        #loadingOverlay {
-            display: none;
-            text-align: center;
+        .card {
             padding: 20px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Form Controls */
-        select, textarea {
-            width: 100%;
-            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-family: inherit;
+            border-radius: 10px;
+        }
+        .healthy { color: #166534; }
+        .warning { color: #991b1b; }
+        
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .results { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">🌿 GreenTrack</div>
-            <nav>
-                <a href="#" class="nav-item active">
-                    <span>📊</span> Dashboard
-                </a>
-                <a href="tracker.html" class="nav-item">
-                    <span>📝</span> Activity Tracker
-                </a>
-                <a href="#" class="nav-item">
-                    <span>🌱</span> My Garden
-                </a>
-                <a href="#" class="nav-item">
-                    <span>⚙️</span> Settings
-                </a>
-            </nav>
-            <div style="margin-top: 200px">
-                <a href="index.html" class="nav-item" style="color: #ff7675">
-                    <span>🚪</span> Logout
-                </a>
-            </div>
+    <header>
+        <h1>GreenTrack</h1>
+        <p>Your Agricultural Intelligence Partner</p>
+    </header>
+
+    <div class="container">
+        <div class="nav">
+            <a href="main.html">Dashboard</a>
+            <a href="tracker.html">Activity Tracker</a>
+            <a href="index.html" onclick="localStorage.removeItem('user')">Logout</a>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
-                <div>
-                    <h1 style="margin: 0">Agricultural Intelligence</h1>
-                    <p style="color: #666">Welcome back, <span id="userName">Explorer</span></p>
-                </div>
-                <div class="user-profile">
-                    <div class="avatar" id="userInitial">A</div>
-                    <div id="userEmail" style="font-size: 0.9rem; color: #666"></div>
-                </div>
-            </div>
-
-            <div class="scan-container">
-                <div class="upload-card" id="dropZone">
-                    <div id="defaultPrompt">
-                        <div style="font-size: 3rem; margin-bottom: 20px">📸</div>
-                        <h2>Scan Your Specimen</h2>
-                        <p>Drag & drop or click to upload a photo of your plant for AI analysis.</p>
-                        
-                        <div style="max-width: 300px; margin: 30px auto; text-align: left;">
-                            <label>Plant Type</label>
-                            <select id="plantType">
-                                <option value="Mango">Mango</option>
-                                <option value="Tomato">Tomato</option>
-                                <option value="Potato">Potato</option>
-                                <option value="Other">Other/Unknown</option>
-                            </select>
-                            
-                            <label>Analysis Focus</label>
-                            <select id="analysisPart">
-                                <option value="Leaf">Leaf/Foliage</option>
-                                <option value="Fruit">Fruit/Vegetable</option>
-                                <option value="Stem">Stem/Trunk</option>
-                            </select>
-                        </div>
-
-                        <input type="file" id="fileInput" hidden accept="image/*">
-                        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">Analyze Now</button>
-                    </div>
-
-                    <div id="loadingOverlay">
-                        <div class="spinner"></div>
-                        <h3>AI is analyzing cellular patterns...</h3>
-                        <p>Detecting pathogens and ecosystem stress signals.</p>
-                    </div>
-                </div>
-
-                <div class="recommendation-card">
-                    <h3>Smart Recommendations</h3>
-                    <p style="font-size: 0.9rem; color: #666">Based on local ecosystem data.</p>
-                    <div class="plant-list" id="recommendationList">
-                        <!-- Loaded dynamically -->
-                    </div>
-                </div>
-            </div>
+        <div class="scan-section">
+            <h2>Scan Plant for Disease</h2>
+            <p>Upload a photo to detect diseases and get solutions.</p>
+            <input type="file" id="imageInput" style="margin-bottom: 20px;"><br>
+            <button class="btn" onclick="analyzePlant()">Analyze Now</button>
         </div>
-    </div>
 
-    <!-- Diagnostic Modal -->
-    <div class="modal" id="resultModal">
-        <div class="modal-content">
-            <div class="modal-left">
-                <img src="" id="uploadedImage" class="result-img">
-                <div style="margin-top: 20px; text-align: center;">
-                    <p style="color: #666; font-size: 0.9rem;">Analysis Confidence</p>
-                    <h3 id="confidenceText">0%</h3>
-                </div>
+        <div class="results">
+            <div class="card">
+                <h3>Diagnostic Result</h3>
+                <div id="diagnosticOutput">No analysis performed yet.</div>
             </div>
-            <div class="modal-right">
-                <span id="statusBadge" class="status-badge">Healthy</span>
-                <h2 id="diseaseName" style="margin: 0 0 10px 0">No Pathogens Found</h2>
-                <p id="affectedPart" style="color: #666; margin-bottom: 30px">Plant Foliage</p>
-                
-                <div id="solutionSection">
-                    <h4 style="margin-bottom: 10px">Recommended Actions:</h4>
-                    <ul class="solution-list" id="solutionList">
-                        <li>Specimen shows optimal health.</li>
-                    </ul>
-                </div>
-
-                <button class="btn-upload" style="width: 100%" onclick="closeModal()">Complete Session</button>
+            <div class="card">
+                <h3>Recommendations</h3>
+                <div id="recommendationOutput">Sync location for recommendations.</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Check Auth
         const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) {
-            window.location.href = 'index.html';
-        }
+        if (!user) window.location.href = 'index.html';
 
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('userInitial').textContent = user.name[0];
-        document.getElementById('userEmail').textContent = user.email;
-
-        const API_URL = "/api";
-
-        // Handle File Selection
-        const fileInput = document.getElementById('fileInput');
-        fileInput.onchange = (e) => {
-            if (e.target.files.length > 0) {
-                uploadImage(e.target.files[0]);
-            }
-        };
-
-        async function uploadImage(file) {
-            const plant = document.getElementById('plantType').value;
-            const part = document.getElementById('analysisPart').value;
-
-            document.getElementById('defaultPrompt').style.display = 'none';
-            document.getElementById('loadingOverlay').style.display = 'block';
+        async function analyzePlant() {
+            const fileInput = document.getElementById('imageInput');
+            if (!fileInput.files[0]) return alert("Please select an image");
 
             const formData = new FormData();
-            formData.append('image', file);
-            formData.append('plant', plant);
-            formData.append('part', part);
+            formData.append('image', fileInput.files[0]);
+            formData.append('plant', 'Mango'); // Default
             formData.append('email', user.email);
 
+            document.getElementById('diagnosticOutput').innerHTML = "Analyzing...";
+
             try {
-                const response = await fetch(`${API_URL}/predict-disease`, {
+                // Fixed for cloud: uses relative path
+                const response = await fetch('/api/predict-disease', {
                     method: 'POST',
                     body: formData
                 });
-                
-                const result = await response.json();
-                showResults(result, URL.createObjectURL(file));
-            } catch (error) {
-                alert('Analysis failed. Please check connection.');
-                document.getElementById('defaultPrompt').style.display = 'block';
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-
-        function showResults(data, imgUrl) {
-            document.getElementById('loadingOverlay').style.display = 'none';
-            document.getElementById('defaultPrompt').style.display = 'block';
-            
-            const modal = document.getElementById('resultModal');
-            document.getElementById('uploadedImage').src = imgUrl;
-            document.getElementById('confidenceText').textContent = (data.confidence_score * 100).toFixed(1) + '%';
-            
-            const badge = document.getElementById('statusBadge');
-            badge.className = 'status-badge ' + (data.health_status.includes('Healthy') ? 'status-healthy' : 'status-critical');
-            badge.textContent = data.health_status;
-            
-            document.getElementById('diseaseName').textContent = data.disease_id;
-            document.getElementById('affectedPart').textContent = 'Specimen Focus: ' + (data.affected_part || 'Foliage');
-            
-            const solList = document.getElementById('solutionList');
-            solList.innerHTML = data.solution_steps.map(s => `<li>${s}</li>`).join('');
-            
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('resultModal').style.display = 'none';
-            location.reload(); // Refresh to update tracker if needed
-        }
-
-        // Load Recommendations
-        async function loadRecommendations() {
-            try {
-                const response = await fetch(`${API_URL}/recommend-plants`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        month: 'May',
-                        current_temp: 32,
-                        soil_type: 'Loamy'
-                    })
-                });
                 const data = await response.json();
                 
-                const list = document.getElementById('recommendationList');
-                list.innerHTML = data.recommendations.map(r => `
-                    <div class="plant-item">
-                        <div style="flex-grow: 1">
-                            <div style="font-weight: 600">${r.name}</div>
-                            <div style="font-size: 0.8rem; color: #666">${r.reason}</div>
-                        </div>
-                        <div class="match-score">${r.match}% Match</div>
-                    </div>
-                `).join('');
+                document.getElementById('diagnosticOutput').innerHTML = `
+                    <p class="${data.health_status === 'Healthy' ? 'healthy' : 'warning'}">
+                        <strong>Status:</strong> ${data.health_status}<br>
+                        <strong>Diagnosis:</strong> ${data.disease_id}
+                    </p>
+                    <p><strong>Solutions:</strong><br>${data.solution_steps.join('<br>')}</p>
+                `;
             } catch (e) {
-                console.error('Rec failed');
+                document.getElementById('diagnosticOutput').innerHTML = "Error connecting to AI service.";
             }
         }
-
-        loadRecommendations();
     </script>
 </body>
 </html>
