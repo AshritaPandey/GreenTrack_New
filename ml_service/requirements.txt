@@ -1,12 +1,8 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
 fastapi==0.110.1
 uvicorn==0.29.0
-gunicorn==21.2.0
-tensorflow
-scikit-learn
-pandas
 python-multipart
-joblib
 requests
 pillow
-torch
-torchvision
