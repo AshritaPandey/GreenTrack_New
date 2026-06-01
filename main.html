@@ -356,7 +356,7 @@
       const recList = document.getElementById('rec-list');
       recList.innerHTML = "<p>Analyzing Ecosystem...</p>";
       try {
-        const res = await fetch('http://localhost:3000/api/recommend', {
+        const res = await fetch('/api/recommend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ month, current_temp: temp, soil_type: soil, area, rain_prob: rain, nutrients })
@@ -379,7 +379,7 @@
       const select = document.getElementById("plant-select");
       const detailsGrid = document.getElementById("plant-details");
       try {
-        const response = await fetch('http://localhost:3000/api/plants');
+        const response = await fetch('/api/plants');
         const plantData = await response.json();
         Object.keys(plantData).forEach(name => {
           const opt = document.createElement("option");

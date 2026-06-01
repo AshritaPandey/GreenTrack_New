@@ -329,7 +329,7 @@
     async function populatePlantSelect() {
       const select = document.getElementById("plantName");
       try {
-        const response = await fetch('http://localhost:3000/api/plants');
+        const response = await fetch('/api/plants');
         if (response.ok) {
           const plantData = await response.json();
           Object.keys(plantData).forEach(name => {
@@ -346,7 +346,7 @@
     // Load logs from backend using the correct API endpoint
     async function fetchLogs() {
       try {
-        const res = await fetch(`http://localhost:3000/api/tracker/${user.email}`);
+        const res = await fetch(`/api/tracker/${user.email}`);
         if (res.ok) {
           const logs = await res.json();
           window.userLogs = logs;
@@ -584,7 +584,7 @@
     async function deleteLog(logId) {
       if (!confirm("Are you sure you want to delete this growth entry?")) return;
       try {
-        const res = await fetch("http://localhost:3000/api/delete-log", {
+        const res = await fetch("/api/delete-log", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user.email, id: logId })
@@ -608,7 +608,7 @@
       if (highlightBox) highlightBox.style.display = "none";
 
       try {
-        const res = await fetch("http://localhost:3000/api/analyze-health", {
+        const res = await fetch("/api/analyze-health", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ plant, notes, imageUrl: imgUrl })
@@ -677,7 +677,7 @@
       formData.append("date", formattedDate);
 
       try {
-        const res = await fetch("http://localhost:3000/api/upload", {
+        const res = await fetch("/api/upload", {
           method: "POST",
           body: formData
         });

@@ -222,7 +222,7 @@ app.post("/api/analyze-health", async (req, res) => {
   const { plant, notes, imageUrl } = req.body;
   
   try {
-    const fullImagePath = imageUrl ? path.join(DATA_DIR, imageUrl.replace('http://localhost:3000', '')) : null;
+    const fullImagePath = imageUrl ? path.join(DATA_DIR, imageUrl) : null;
     
     const formData = new URLSearchParams();
     formData.append('plant', plant);
