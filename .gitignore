@@ -1,21 +1,26 @@
-# Web & Node
+# Node
 node_modules/
-.env
-uploads/
-*.log
 
-# Python & ML
+# Python
+.venv/
+venv/
 __pycache__/
 *.pyc
-venv/
-.venv/
-.pytest_cache/
-.ipynb_checkpoints/
 
-# OS Specific
+# Uploads & Runtime Files
+uploads/
+logs.json
+pip_log.txt
+
+# Development Files
+.vscode/
+
+# Scratch Scripts
+scratch/
+
+# OS Files
 .DS_Store
 Thumbs.db
 
-# Storage (Render ephemeral - will be created on start)
-logs.json
-data/*.json
+# Optional (Huge Training Dataset)
+dataset/

@@ -19,5 +19,8 @@
   "Ginger": { "soil": "Rich, loamy", "climate": "Tropical, humid", "temperature": "25°C – 30°C", "months": "May – June", "watering": "Daily" },
   "Watermelon": { "soil": "Sandy loam, well-drained", "climate": "Hot and sunny", "temperature": "25°C – 35°C", "months": "April – July", "watering": "Daily in summer" },
   "Potato": { "soil": "Silty, loamy, and well-drained", "climate": "Cool", "temperature": "15°C – 20°C", "months": "October – February", "watering": "Moderate, every 2-3 days" },
-  "Groundnut": { "soil": "Sandy, red, or loamy soil", "climate": "Tropical", "temperature": "25°C – 32°C", "months": "June – September", "watering": "Regularly but avoid waterlogging" }
+  "Groundnut": { "soil": "Sandy, red, or loamy soil", "climate": "Tropical", "temperature": "25°C – 32°C", "months": "June – September", "watering": "Regularly but avoid waterlogging" },
+  "Rice": { "soil": "Clayey or heavy clay loams", "climate": "Hot and humid", "temperature": "21°C – 37°C", "months": "June – November", "watering": "Keep submerged or heavily watered" },
+  "Wheat": { "soil": "Well-drained loamy to clay loams", "climate": "Cool and dry", "temperature": "10°C – 25°C", "months": "October – March", "watering": "Moderate, once in 10-15 days" },
+  "Strawberry": { "soil": "Sandy loam, rich in organic matter", "climate": "Cool and sunny", "temperature": "15°C – 25°C", "months": "November – February", "watering": "Regular, keep soil moist but not soggy" }
 }
