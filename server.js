@@ -1,9 +1,13 @@
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,26 +18,49 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ==========================
-// Setup Folders and Files
+// Database Setup
 // ==========================
-// DATA_DIR allows Render to use a persistent disk mount
-const DATA_DIR = process.env.DATA_DIR || __dirname;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-const uploadDir = path.join(DATA_DIR, "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err));
 
-const USERS_FILE = path.join(DATA_DIR, "users.json");
-const LOGS_FILE = path.join(DATA_DIR, "logs.json");
-const PLANTS_FILE = path.join(DATA_DIR, "plants.json");
+// Models
+const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
+const User = mongoose.model("User", UserSchema);
 
-// Helper to ensure files exist
-[USERS_FILE, LOGS_FILE, PLANTS_FILE].forEach(file => {
-  if (!fs.existsSync(file)) {
-    fs.writeFileSync(file, JSON.stringify({}, null, 2));
+const LogSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  date: String,
+  height: String,
+  plant: String,
+  notes: String,
+  image: String
+});
+const Log = mongoose.model("Log", LogSchema);
+
+// ==========================
+// Cloudinary Setup
+// ==========================
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "greentrack_uploads",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"]
   }
 });
+const upload = multer({ storage });
+
+// ==========================
+// Setup Folders and Files (Legacy/Local fallbacks)
+// ==========================
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const PLANTS_FILE = path.join(DATA_DIR, "plants.json");
 
 function readJSON(file) {
   try {
@@ -42,12 +69,13 @@ function readJSON(file) {
     return {};
   }
 }
-
 function writeJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-// Populate default plants if empty
+if (!fs.existsSync(PLANTS_FILE)) {
+  writeJSON(PLANTS_FILE, {});
+}
 const plantsInit = readJSON(PLANTS_FILE);
 if (Object.keys(plantsInit).length === 0) {
   const defaultPlants = {
@@ -73,16 +101,6 @@ if (Object.keys(plantsInit).length === 0) {
   writeJSON(PLANTS_FILE, defaultPlants);
 }
 
-
-// ==========================
-// Multer setup (image upload)
-// ==========================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-});
-const upload = multer({ storage });
-
 // ==========================
 // User Authentication Endpoints
 // ==========================
@@ -93,23 +111,23 @@ app.post("/api/signup", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const users = readJSON(USERS_FILE);
     const lowerEmail = email.toLowerCase();
     
-    if (users[lowerEmail]) {
+    const existingUser = await User.findOne({ email: lowerEmail });
+    if (existingUser) {
       return res.status(400).json({ error: "Account already exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    users[lowerEmail] = {
+    const newUser = new User({
       name,
       email: lowerEmail,
       password: hashedPassword
-    };
+    });
+    await newUser.save();
 
-    writeJSON(USERS_FILE, users);
     res.status(201).json({ message: "Account created successfully", user: { name, email: lowerEmail } });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
@@ -123,9 +141,8 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const users = readJSON(USERS_FILE);
     const lowerEmail = email.toLowerCase();
-    const user = users[lowerEmail];
+    const user = await User.findOne({ email: lowerEmail });
 
     if (!user) {
       return res.status(400).json({ error: "Invalid login credentials" });
@@ -153,68 +170,74 @@ app.get("/api/plants", (req, res) => {
 // ==========================
 // Tracking & Log Endpoints
 // ==========================
-app.post("/api/upload", upload.single("image"), (req, res) => {
+app.post("/api/upload", upload.single("image"), async (req, res) => {
   const { email, date, height, notes, plant } = req.body;
 
   if (!email || !date || !height || !plant) {
     return res.status(400).json({ error: "Missing required fields (email, date, height, plant)" });
   }
 
-  const logs = readJSON(LOGS_FILE);
-  if (!logs[email]) logs[email] = [];
+  try {
+    const newLog = new Log({
+      email,
+      date,
+      height,
+      plant,
+      notes: notes || "",
+      image: req.file ? req.file.path : null // Cloudinary returns URL in path
+    });
+    
+    await newLog.save();
 
-  const entry = {
-    id: Date.now().toString(),
-    date,
-    height,
-    plant,
-    notes: notes || "",
-    image: req.file ? `/uploads/${req.file.filename}` : null
-  };
-
-  logs[email].push(entry);
-  writeJSON(LOGS_FILE, logs);
-
-  res.json({
-    message: "Plant log saved successfully",
-    entry
-  });
-});
-
-app.get("/api/tracker/:email", (req, res) => {
-  const logs = readJSON(LOGS_FILE);
-  const userLogs = logs[req.params.email] || [];
-  
-  // Migration fallback: assign IDs if missing
-  let changed = false;
-  userLogs.forEach((log, index) => {
-    if (!log.id) {
-      log.id = `migrated-${Date.now()}-${index}`;
-      changed = true;
-    }
-  });
-  
-  if (changed) {
-    logs[req.params.email] = userLogs;
-    writeJSON(LOGS_FILE, logs);
+    res.json({
+      message: "Plant log saved successfully",
+      entry: {
+        id: newLog._id.toString(),
+        date: newLog.date,
+        height: newLog.height,
+        plant: newLog.plant,
+        notes: newLog.notes,
+        image: newLog.image
+      }
+    });
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save log" });
   }
-
-  res.json(userLogs);
 });
 
-app.post("/api/delete-log", (req, res) => {
+app.get("/api/tracker/:email", async (req, res) => {
+  try {
+    const userLogs = await Log.find({ email: req.params.email });
+    const formattedLogs = userLogs.map(log => ({
+      id: log._id.toString(),
+      date: log.date,
+      height: log.height,
+      plant: log.plant,
+      notes: log.notes,
+      image: log.image
+    }));
+    res.json(formattedLogs);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch logs" });
+  }
+});
+
+app.post("/api/delete-log", async (req, res) => {
   const { email, id } = req.body;
   if (!email || !id) {
     return res.status(400).json({ error: "Missing email or log id" });
   }
 
-  const logs = readJSON(LOGS_FILE);
-  if (logs[email]) {
-    logs[email] = logs[email].filter(log => log.id !== id);
-    writeJSON(LOGS_FILE, logs);
-    res.json({ message: "Log deleted successfully" });
-  } else {
-    res.status(404).json({ error: "No logs found for this user" });
+  try {
+    const deletedLog = await Log.findOneAndDelete({ _id: id, email });
+    if (deletedLog) {
+      res.json({ message: "Log deleted successfully" });
+    } else {
+      res.status(404).json({ error: "No logs found for this user or unauthorized" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete log" });
   }
 });
 
@@ -222,12 +245,18 @@ app.post("/api/analyze-health", async (req, res) => {
   const { plant, notes, imageUrl } = req.body;
   
   try {
-    const fullImagePath = imageUrl ? path.join(DATA_DIR, imageUrl) : null;
-    
     const formData = new URLSearchParams();
     formData.append('plant', plant);
     formData.append('notes', notes || '');
-    if (fullImagePath) formData.append('image_path', fullImagePath);
+    
+    if (imageUrl) {
+        if (imageUrl.startsWith('http')) {
+            formData.append('image_url', imageUrl);
+        } else {
+            const fullImagePath = path.join(DATA_DIR, imageUrl);
+            formData.append('image_path', fullImagePath);
+        }
+    }
 
     const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
     const response = await fetch(`${ML_SERVICE_URL}/predict-disease`, {
@@ -263,7 +292,6 @@ app.post("/api/recommend", async (req, res) => {
 // ==========================
 // Static File Serving
 // ==========================
-app.use("/uploads", express.static(uploadDir));
 app.use(express.static(__dirname));
 
 // Explicitly serve index.html as the root
@@ -272,5 +300,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });

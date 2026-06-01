@@ -134,14 +134,13 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-def analyze_leaf_pixels(image_path):
+def analyze_leaf_pixels(img):
     """
     Classical Computer Vision calibration: analyzes leaf color histograms to identify
     necrotic spots, rust patterns, or pest bite markings.
     Filters out background shadows, dark plastic pots, and bright sand by enforcing a neighborhood-green check.
     """
     try:
-        img = Image.open(image_path).convert('RGB')
         img_resized = img.resize((100, 100)) # fast analysis resize
         
         green_pixels = 0
@@ -335,13 +334,19 @@ DISEASE_REMEDIES = {
     }
 }
 
+import requests
+
 @app.post("/predict-disease")
 async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_url: str = Form(None), image_path: str = Form(None)):
     try:
-        if not image_path:
-            raise HTTPException(status_code=400, detail="Local image path required")
+        if image_url:
+            response = requests.get(image_url)
+            img = Image.open(io.BytesIO(response.content)).convert('RGB')
+        elif image_path:
+            img = Image.open(image_path).convert('RGB')
+        else:
+            raise HTTPException(status_code=400, detail="Local image_path or image_url required")
             
-        img = Image.open(image_path).convert('RGB')
         input_tensor = preprocess(img)
         input_batch = input_tensor.unsqueeze(0).to(device)
 
@@ -366,7 +371,7 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
                 break
         
         # 2. Run Classical CV Leaf Pixel analysis (adds extreme visual precision for spotted/yellowed leaf checks)
-        pixel_report = analyze_leaf_pixels(image_path)
+        pixel_report = analyze_leaf_pixels(img)
         
         # 3. ADVANCED MULTIMODAL NLP CALIBRATION
         # The AI combines ImageNet vision, Classical Color Pixels, and Natural Language Understanding of the farmer's notes!
