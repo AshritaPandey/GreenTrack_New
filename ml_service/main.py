@@ -329,15 +329,24 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         # 2. ADVANCED MULTIMODAL NLP CALIBRATION
         notes_lower = notes.lower()
         
-        disease_keywords = ["disease", "spot", "bump", "gall", "pest", "insect", "white", "hole", "issue", "sick", "rust", "mold", "rot"]
+        disease_keywords = ["disease", "spot", "bump", "gall", "pest", "insect", "white", "hole", "issue", "sick", "rust", "mold", "rot", "bug", "wilt", "dry", "brown", "yellow", "die", "dead"]
+        healthy_keywords = ["good", "healthy", "new", "first", "growth", "seed", "sprout", "grown", "fine", "clean", "emerge", "young", "baby", "small", "growing", "seedling", "sapling", "planted", "beautiful", "perfect", "green"]
+        
         has_symptom_notes = any(keyword in notes_lower for keyword in disease_keywords)
+        has_healthy_notes = any(keyword in notes_lower for keyword in healthy_keywords)
         
         # Check if this is early seedling stage / pot of soil by explicit user notes ONLY
-        is_early_stage = ("seed" in notes_lower or "sprout" in notes_lower or "first" in notes_lower or "start" in notes_lower)
+        early_stage_keywords = ["seed", "sprout", "first", "start", "emerge", "young", "baby", "small", "growing", "seedling", "sapling", "planted", "new"]
+        is_early_stage = any(keyword in notes_lower for keyword in early_stage_keywords)
         
-        if is_early_stage:
-            # MULTIMODAL OVERRIDE: If the farmer explicitly notes early stages
+        if is_early_stage and not has_symptom_notes:
+            # MULTIMODAL OVERRIDE: If the farmer explicitly notes early stages or young plants without symptoms
             predicted_class = f"healthy_{plant_type}"
+            confidence_val = 0.99
+        elif has_healthy_notes and not has_symptom_notes:
+            # MULTIMODAL OVERRIDE: If the user says it is healthy/growing and doesn't mention symptoms
+            predicted_class = f"healthy_{plant_type}"
+            confidence_val = 0.99
         elif has_symptom_notes and "healthy" in predicted_class:
             # If user notes symptoms but model thinks healthy, fallback to general stress
             predicted_class = "fungal_stress_general"
