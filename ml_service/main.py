@@ -126,82 +126,34 @@ else:
 model.to(device)
 model.eval()
 
+import numpy as np
+
+class CropToLeaf(object):
+    def __call__(self, img):
+        img_hsv = img.convert('HSV')
+        np_img = np.array(img_hsv)
+        H = np_img[:, :, 0]
+        S = np_img[:, :, 1]
+        V = np_img[:, :, 2]
+        green_mask = (H > 50) & (H < 130) & (S > 30) & (V > 30)
+        coords = np.argwhere(green_mask)
+        if len(coords) < 100:
+            return img
+        y0, x0 = coords.min(axis=0)
+        y1, x1 = coords.max(axis=0)
+        h, w = img.size[1], img.size[0]
+        pad_y = int((y1 - y0) * 0.2)
+        pad_x = int((x1 - x0) * 0.2)
+        return img.crop((max(0, x0 - pad_x), max(0, y0 - pad_y), min(w, x1 + pad_x), min(h, y1 + pad_y)))
+
 # 4. Image Preprocessing Pipelines
 preprocess = transforms.Compose([
-    transforms.Resize(256),
+    CropToLeaf(),
+    transforms.Resize((256, 256)),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
-
-def analyze_leaf_pixels(img):
-    """
-    Classical Computer Vision calibration: analyzes leaf color histograms to identify
-    necrotic spots, rust patterns, or pest bite markings.
-    Filters out background shadows, dark plastic pots, and bright sand by enforcing a neighborhood-green check.
-    """
-    try:
-        img_resized = img.resize((100, 100)) # fast analysis resize
-        
-        green_pixels = 0
-        brown_necrotic_pixels = 0
-        yellow_pixels = 0
-        
-        # 1. Pre-calculate green leaf mask
-        green_mask = [[False for _ in range(100)] for _ in range(100)]
-        for x in range(100):
-            for y in range(100):
-                r, g, b = img_resized.getpixel((x, y))
-                if g > r * 1.05 and g > b * 1.05 and g > 35:
-                    green_mask[x][y] = True
-                    green_pixels += 1
-
-        # 2. Check for dark-brown necrotic spots immediately adjacent to green leaf regions
-        for x in range(100):
-            for y in range(100):
-                if green_mask[x][y]:
-                    continue
-                    
-                r, g, b = img_resized.getpixel((x, y))
-                
-                # Check for dark-brown necrotic spot color
-                if r > g * 1.1 and r > b * 1.05 and r < 115 and g < 100 and b < 90:
-                    # Neighborhood check: must be within 2 pixels of a green leaf pixel
-                    has_green_neighbor = False
-                    for dx in [-2, -1, 0, 1, 2]:
-                        for dy in [-2, -1, 0, 1, 2]:
-                            nx, ny = x + dx, y + dy
-                            if 0 <= nx < 100 and 0 <= ny < 100:
-                                if green_mask[nx][ny]:
-                                    has_green_neighbor = True
-                                    break
-                        if has_green_neighbor:
-                            break
-                            
-                    if has_green_neighbor:
-                        brown_necrotic_pixels += 1
-                # Check for chlorosis (yellowing)
-                elif r > 120 and g > 120 and b < 95 and abs(r - g) < 25:
-                    yellow_pixels += 1
-                    
-        total_pixels = 10000
-        spot_ratio = brown_necrotic_pixels / total_pixels
-        yellow_ratio = yellow_pixels / total_pixels
-        
-        # Threshold: If neighbor-validated spots cover more than 0.8% of the surface area, it represents active disease stress
-        has_fungal_spots = spot_ratio > 0.008
-        has_chlorosis = yellow_ratio > 0.05
-        
-        return {
-            "green_pixels": green_pixels,
-            "has_fungal_spots": has_fungal_spots,
-            "has_chlorosis": has_chlorosis,
-            "spot_ratio": spot_ratio
-        }
-    except Exception as e:
-        print(f"Leaf pixel analysis error: {e}")
-        return {"green_pixels": 0, "has_fungal_spots": False, "has_chlorosis": False, "spot_ratio": 0.0}
-
 class RecommendationRequest(BaseModel):
     month: str
     current_temp: int
