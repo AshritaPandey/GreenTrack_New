@@ -457,14 +457,13 @@
         // Line or Bar Chart
         if (filter === "all") {
           const plants = [...new Set(logs.map(log => log.plant))];
-          const allDates = [...new Set(logs.map(log => log.date))];
-          allDates.sort((a, b) => new Date(a) - new Date(b));
-          labels = allDates;
+          
+          // Use sequential labels to allow multiple logs per day
+          labels = logs.map((log, index) => \`\${log.date} (#\${index + 1})\`);
 
           plants.forEach((plantName, index) => {
-            const data = labels.map(date => {
-              const matchingLog = logs.find(log => log.plant === plantName && log.date === date);
-              return matchingLog ? parseFloat(matchingLog.height) : null;
+            const data = logs.map(log => {
+              return log.plant === plantName ? parseFloat(log.height) : null;
             });
 
             datasets.push({
@@ -482,7 +481,7 @@
           });
         } else {
           const filteredLogs = logs.filter(log => log.plant === filter);
-          labels = filteredLogs.map(log => log.date);
+          labels = filteredLogs.map((log, idx) => \`\${log.date} (#\${idx + 1})\`);
           const data = filteredLogs.map(log => parseFloat(log.height));
 
           datasets.push({
