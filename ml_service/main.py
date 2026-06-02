@@ -20,27 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 1. Standard CNN Architecture - Fine-Tuned MobileNetV2
 # -------------------------------------------------------------
-# 1. Custom CNN Architecture - Fine-Tuned MobileNetV2 Classifier
-# -------------------------------------------------------------
-class PlantDiseaseClassifier(nn.Module):
-    def __init__(self, num_classes=10):
-        super(PlantDiseaseClassifier, self).__init__()
-        # Load MobileNetV2 pretrained backbone
-        self.backbone = models.mobilenet_v2(pretrained=True)
-        
-        # Replace classification head with a custom deep projection network
-        in_features = self.backbone.classifier[1].in_features
-        self.backbone.classifier = nn.Sequential(
-            nn.Dropout(p=0.2),
-            nn.Linear(in_features, 512),
-            nn.ReLU(),
-            nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes)
-        )
-        
-    def forward(self, x):
-        return self.backbone(x)
+def get_model(num_classes):
+    model = models.mobilenet_v2(pretrained=False)
+    model.classifier[1] = nn.Linear(model.last_channel, num_classes)
+    return model
 
 # 2. Define target disease classes
 DISEASE_CLASSES = [
@@ -87,7 +72,7 @@ if os.path.exists(weights_path) and os.path.exists(indices_path):
     num_classes = len(class_to_idx)
     
     # Initialize model with exact number of trained classes
-    model = PlantDiseaseClassifier(num_classes=num_classes)
+    model = get_model(num_classes)
     model.load_state_dict(torch.load(weights_path, map_location=device))
     
     # Override standard list with the specifically trained ones
