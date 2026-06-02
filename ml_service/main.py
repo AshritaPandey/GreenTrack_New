@@ -115,7 +115,10 @@ import numpy as np
 
 class CropToLeaf(object):
     def __call__(self, img):
-        img_hsv = img.convert('HSV')
+        # Resize to thumbnail to prevent Out-Of-Memory (OOM) crashes on huge smartphone photos!
+        small_img = img.copy()
+        small_img.thumbnail((300, 300))
+        img_hsv = small_img.convert('HSV')
         np_img = np.array(img_hsv)
         H = np_img[:, :, 0]
         S = np_img[:, :, 1]
@@ -124,8 +127,18 @@ class CropToLeaf(object):
         coords = np.argwhere(green_mask)
         if len(coords) < 100:
             return img
+        
+        # Calculate ratio since we used a thumbnail
+        ratio_y = img.size[1] / small_img.size[1]
+        ratio_x = img.size[0] / small_img.size[0]
+        
         y0, x0 = coords.min(axis=0)
         y1, x1 = coords.max(axis=0)
+        
+        # Map back to original size
+        y0, y1 = int(y0 * ratio_y), int(y1 * ratio_y)
+        x0, x1 = int(x0 * ratio_x), int(x1 * ratio_x)
+        
         h, w = img.size[1], img.size[0]
         pad_y = int((y1 - y0) * 0.2)
         pad_x = int((x1 - x0) * 0.2)
