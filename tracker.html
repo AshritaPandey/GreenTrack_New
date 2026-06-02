@@ -710,7 +710,7 @@
     };
 
     // Load initial data
-    document.getElementById('logDate').valueAsDate = new Date(); // Default to today
+    document.getElementById('logDate').value = new Date().toISOString().split('T')[0]; // Default to today
     populatePlantSelect();
     fetchLogs();
     syncLocation();
