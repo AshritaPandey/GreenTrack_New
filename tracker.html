@@ -397,7 +397,7 @@
 
       const logs = [...window.userLogs];
       // Sort chronologically by date/timestamp
-      logs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+      logs.sort((a, b) => a.id.localeCompare(b.id));
 
       let datasets = [];
       let labels = [];
@@ -618,6 +618,19 @@
         setTimeout(() => {
           scanner.style.display = "none";
           statusDiv.style.display = "block";
+
+          if (data.error) {
+            statusDiv.style.background = "#fee2e2";
+            statusDiv.innerHTML = `
+              <div style="font-weight: 800; color: #b91c1c; margin-bottom: 0.5rem; font-size: 1.05rem;">
+                ⚠️ AI Service Unavailable
+              </div>
+              <div style="font-size: 0.95rem; color: #334155; font-weight: 600;">Error: ${data.error}</div>
+              <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">The AI Engine is currently offline or unreachable. If deployed, please ensure the ML Service is running.</div>
+            `;
+            return;
+          }
+          
           statusDiv.style.background = data.highlight_area ? "#fef2f2" : "#f0fdf4";
           
           if (data.highlight_area && highlightBox) {
@@ -645,6 +658,7 @@
       } catch(e) {
         scanner.style.display = "none";
         btn.style.display = "block";
+        alert("Failed to connect to the backend server.");
       }
     }
 
