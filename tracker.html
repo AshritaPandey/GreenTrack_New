@@ -463,7 +463,7 @@
           const plants = [...new Set(logs.map(log => log.plant))];
           
           // Use sequential labels to allow multiple logs per day
-          labels = logs.map((log, index) => \`\${log.date} (#\${index + 1})\`);
+          labels = logs.map((log, index) => `${log.date} (#${index + 1})`);
 
           plants.forEach((plantName, index) => {
             const data = logs.map(log => {
@@ -485,7 +485,7 @@
           });
         } else {
           const filteredLogs = logs.filter(log => log.plant === filter);
-          labels = filteredLogs.map((log, idx) => \`\${log.date} (#\${idx + 1})\`);
+          labels = filteredLogs.map((log, idx) => `${log.date} (#${idx + 1})`);
           const data = filteredLogs.map(log => parseFloat(log.height));
 
           datasets.push({
