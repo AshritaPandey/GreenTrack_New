@@ -98,6 +98,10 @@
               <input type="number" id="plantHeight" placeholder="e.g. 45" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem;" />
             </div>
             <div class="input-group" style="margin-bottom: 1.2rem;">
+              <label for="logDate" style="display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.5rem;">Date of Observation</label>
+              <input type="date" id="logDate" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem;" />
+            </div>
+            <div class="input-group" style="margin-bottom: 1.2rem;">
               <label style="display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.5rem;">Plant Image</label>
               
               <!-- Input Mode Selection -->
@@ -685,8 +689,9 @@
       
       formData.append("notes", document.getElementById("plantNotes").value);
       
-      // Append properly formatted current date for backend requirement
-      const formattedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const inputDate = document.getElementById("logDate").value;
+      const dateObj = inputDate ? new Date(inputDate) : new Date();
+      const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       formData.append("date", formattedDate);
 
       try {
@@ -705,6 +710,7 @@
     };
 
     // Load initial data
+    document.getElementById('logDate').valueAsDate = new Date(); // Default to today
     populatePlantSelect();
     fetchLogs();
     syncLocation();
