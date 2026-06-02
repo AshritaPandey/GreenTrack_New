@@ -709,11 +709,17 @@
       }
     };
 
-    // Load initial data
-    document.getElementById('logDate').value = new Date().toISOString().split('T')[0]; // Default to today
-    populatePlantSelect();
-    fetchLogs();
-    syncLocation();
+    // Load initial data safely
+    try {
+      const todayString = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('logDate');
+      dateInput.value = todayString;
+      dateInput.max = todayString; // Prevent selecting future dates
+    } catch(e) { console.error("Error setting date:", e); }
+
+    try { populatePlantSelect(); } catch(e) { console.error(e); }
+    try { fetchLogs(); } catch(e) { console.error(e); }
+    try { syncLocation(); } catch(e) { console.error(e); }
   </script>
 </body>
 </html>
