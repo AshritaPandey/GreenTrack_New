@@ -8,28 +8,15 @@ from torchvision import datasets, transforms, models
 from PIL import Image
 
 # 1. Custom CNN Architecture with fine-tuning head
-class PlantDiseaseClassifier(nn.Module):
-    def __init__(self, num_classes=10):
-        super(PlantDiseaseClassifier, self).__init__()
-        # Load MobileNetV2 pretrained backbone
-        self.backbone = models.mobilenet_v2(pretrained=True)
-        
-        # Standard Transfer Learning: Freeze early features to retain ImageNet filters
-        for param in self.backbone.features.parameters():
-            param.requires_grad = False
-            
-        # Replace classification head with custom deep network mapped to specific diseases
-        in_features = self.backbone.classifier[1].in_features
-        self.backbone.classifier = nn.Sequential(
-            nn.Dropout(p=0.2),
-            nn.Linear(in_features, 512),
-            nn.ReLU(),
-            nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes)
-        )
-        
-    def forward(self, x):
-        return self.backbone(x)
+def get_model(num_classes):
+    model = models.mobilenet_v2(pretrained=True)
+    # Standard Transfer Learning: Freeze early features to retain ImageNet filters
+    for param in model.features.parameters():
+        param.requires_grad = False
+    
+    # Simple linear head exactly matching main.py
+    model.classifier[1] = nn.Linear(model.last_channel, num_classes)
+    return model
 
 def train_model(dataset_dir, epochs=10, batch_size=32, lr=0.001):
     """
@@ -87,11 +74,11 @@ def train_model(dataset_dir, epochs=10, batch_size=32, lr=0.001):
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=2)
     
     # 4. Initialize Network
-    model = PlantDiseaseClassifier(num_classes=num_classes).to(device)
+    model = get_model(num_classes).to(device)
     
     # 5. Define Loss Function and Optimizer
     # We unfreeze upper convolutional layers in the back-half of training to fine-tune
-    optimizer = optim.Adam(model.backbone.classifier.parameters(), lr=lr)
+    optimizer = optim.Adam(model.classifier.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
     
     best_acc = 0.0

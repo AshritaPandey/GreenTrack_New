@@ -311,18 +311,9 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         predicted_class = None
         confidence_val = 0.0
         
-        # Enforce plant-specific prediction: only allow predictions for the selected plant
-        for i in range(len(sorted_indices)):
-            idx = sorted_indices[i].item()
-            class_name = DISEASE_CLASSES[idx]
-            if plant_type in class_name or "general" in class_name:
-                predicted_class = class_name
-                confidence_val = float(sorted_probs[i].item())
-                break
-                
-        if not predicted_class:
-            predicted_class = f"healthy_{plant_type}"
-            confidence_val = 0.99
+        # 1. Take the top CNN prediction directly without restricting by dropdown choice
+        predicted_class = DISEASE_CLASSES[sorted_indices[0].item()]
+        confidence_val = float(sorted_probs[0].item())
             
         # 2. ADVANCED MULTIMODAL NLP CALIBRATION
         notes_lower = notes.lower()
