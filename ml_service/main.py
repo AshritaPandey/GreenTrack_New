@@ -325,12 +325,23 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         # HYBRID LOGIC 1: Enforce plant-specific disease IF the plant is known in our dataset
         known_plant_in_dataset = any(plant_type in c.lower() for c in DISEASE_CLASSES)
         if known_plant_in_dataset:
+            specific_found = False
+            # First pass: Look ONLY for specific diseases for this exact plant
             for idx in sorted_indices:
                 class_name = DISEASE_CLASSES[idx]
-                if plant_type in class_name or "general" in class_name:
+                if plant_type in class_name and "general" not in class_name:
                     raw_prediction = class_name
                     confidence_val = float(rf_probs[idx])
+                    specific_found = True
                     break
+            # Second pass: If somehow no specific disease was found, allow general
+            if not specific_found:
+                for idx in sorted_indices:
+                    class_name = DISEASE_CLASSES[idx]
+                    if plant_type in class_name or "general" in class_name:
+                        raw_prediction = class_name
+                        confidence_val = float(rf_probs[idx])
+                        break
                     
         # HYBRID LOGIC 2: Convert the specific prediction into a general Binary Health check
         is_healthy = "healthy" in raw_prediction.lower() or "optimal" in raw_prediction.lower()
@@ -424,7 +435,8 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
                 "solution_steps": [
                     f"Active symptoms of {clean_name} detected.",
                     "Isolate the affected plant to prevent cross-contamination.",
-                    f"Research crop-specific fungicides or pest control for {clean_name}."
+                    "Apply a broad-spectrum organic fungicide (e.g., Neem oil) or copper-based fungicide.",
+                    "Ensure adequate air circulation and avoid watering the leaves directly to reduce humidity."
                 ],
                 "highlight_area": {"x": 25, "y": 25, "w": 50, "h": 50}
             }
