@@ -312,9 +312,12 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         confidence_val = 0.0
         
         # 1. Take the top CNN prediction directly without restricting by dropdown choice
-        predicted_class = DISEASE_CLASSES[sorted_indices[0].item()]
+        raw_prediction = DISEASE_CLASSES[sorted_indices[0].item()]
         confidence_val = float(sorted_probs[0].item())
             
+        # HYBRID MODEL LOGIC: Convert the specific prediction into a general Binary Health check
+        is_healthy = "healthy" in raw_prediction.lower() or "optimal" in raw_prediction.lower()
+        
         # 2. ADVANCED MULTIMODAL NLP CALIBRATION
         notes_lower = notes.lower()
         
@@ -329,16 +332,24 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         is_early_stage = any(keyword in notes_lower for keyword in early_stage_keywords)
         
         if is_early_stage and not has_symptom_notes:
-            # MULTIMODAL OVERRIDE: If the farmer explicitly notes early stages or young plants without symptoms
-            predicted_class = f"healthy_{plant_type}"
+            is_healthy = True
             confidence_val = 0.99
         elif has_healthy_notes and not has_symptom_notes:
-            # MULTIMODAL OVERRIDE: If the user says it is healthy/growing and doesn't mention symptoms
-            predicted_class = f"healthy_{plant_type}"
+            is_healthy = True
             confidence_val = 0.99
-        elif has_symptom_notes and "healthy" in predicted_class:
-            # If user notes symptoms but model thinks healthy, fallback to general stress
-            predicted_class = "fungal_stress_general"
+        elif has_symptom_notes:
+            is_healthy = False
+            
+        # Format the final predicted class dynamically for ANY plant
+        if is_healthy:
+            predicted_class = f"healthy_{plant_type}"
+        else:
+            # If it's diseased, check if the raw prediction actually matches the current plant
+            if plant_type in raw_prediction:
+                predicted_class = raw_prediction
+            else:
+                # Hybrid Fallback: Abstract it to a general disease for the specific plant
+                predicted_class = f"{plant_type}_disease_stress"
             
         # Format confidence display
         confidence_pct = int(confidence_val * 100)
@@ -390,7 +401,7 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         else:
             # It is a brand new disease class that wasn't in our hardcoded dictionary!
             return {
-                "health_status": "⚠️ Concern Detected (Trained CNN)",
+                "health_status": "⚠️ Concern Detected",
                 "issue_identified": clean_name,
                 "confidence": f"{confidence_pct}%",
                 "solution_steps": [
