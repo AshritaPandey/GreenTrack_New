@@ -284,6 +284,9 @@
     const user = JSON.parse(localStorage.getItem("user"));
     if(!user) { window.location.href = "index.html"; }
 
+    // Silently wake up the free-tier Render AI server in the background
+    fetch('https://greentrack-ai-v2.onrender.com/docs', { mode: 'no-cors' }).catch(() => {});
+
     const detectBtn = document.getElementById('detect-btn');
     const statusText = document.getElementById('location-status');
     const monthsArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
