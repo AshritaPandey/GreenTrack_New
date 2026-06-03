@@ -347,7 +347,7 @@
                 waterText.innerText = "Ideal climate. Standard hydration (750ml) is perfect.";
               }
 
-              fetchRecommendations(monthsArr[new Date().getMonth()], temp, soilType, area, rainProb, nutrients);
+              fetchRecommendations(monthsArr[new Date().getMonth()], temp, soilType, rawArea, rainProb, nutrients);
             } catch(e) {
               statusText.textContent = "⚠️ Sync Interrupted.";
             }

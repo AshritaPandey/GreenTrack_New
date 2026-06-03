@@ -616,12 +616,19 @@
       scanner.style.display = "block";
       if (highlightBox) highlightBox.style.display = "none";
 
+      // Add a timeout warning to let the user know the server is waking up
+      let bootWarning = setTimeout(() => {
+        const textElement = scanner.querySelector('div:last-child');
+        if(textElement) textElement.innerHTML = "Waking up AI Cloud Server...<br><span style='font-size: 0.75rem; color: #94a3b8;'>(Render free tier may take up to 3 mins)</span>";
+      }, 5000);
+
       try {
         const res = await fetch("/api/analyze-health", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ plant, notes, imageUrl: imgUrl })
         });
+        clearTimeout(bootWarning);
         const data = await res.json();
         
         setTimeout(() => {
