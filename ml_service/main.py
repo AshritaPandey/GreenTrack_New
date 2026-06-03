@@ -139,6 +139,30 @@ def is_plant_image(img):
     
     return ratio > 0.05
 
+def is_mango_new_growth(img):
+    """Detects healthy reddish/brownish new growth on mango leaves."""
+    small_img = img.copy()
+    small_img.thumbnail((300, 300))
+    img_hsv = small_img.convert('HSV')
+    np_img = np.array(img_hsv)
+    H, S, V = np_img[:, :, 0], np_img[:, :, 1], np_img[:, :, 2]
+    # Red/Pink/Brown hues
+    red_mask = ((H < 25) | (H > 240)) & (S > 40) & (V > 50)
+    return (np.sum(red_mask) / (small_img.size[0] * small_img.size[1])) > 0.15
+
+def get_dark_spot_ratio(img):
+    """Calculates the percentage of dark necrotic spots."""
+    small_img = img.copy()
+    small_img.thumbnail((300, 300))
+    img_hsv = small_img.convert('HSV')
+    np_img = np.array(img_hsv)
+    H, S, V = np_img[:, :, 0], np_img[:, :, 1], np_img[:, :, 2]
+    plant_mask = (H > 10) & (H < 150) & (S > 30) & (V > 20)
+    total_plant = np.sum(plant_mask)
+    if total_plant == 0: return 0.0
+    dark_mask = plant_mask & (V < 70)
+    return np.sum(dark_mask) / total_plant
+
 
 # 4. Image Preprocessing Pipelines
 preprocess = transforms.Compose([
@@ -369,6 +393,13 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
             confidence_val = max(0.95, confidence_val)
         elif has_symptom_notes:
             is_healthy = False
+            
+        # CV Protection: Fix false positive Anthracnose on Healthy Red Mango Leaves
+        if plant_type == "mango" and not is_healthy and "anthracnose" in raw_prediction:
+            # If the leaf is overwhelmingly red (new growth) OR has almost no dark necrotic spots
+            if is_mango_new_growth(img) or get_dark_spot_ratio(img) < 0.05:
+                is_healthy = True
+                confidence_val = max(0.90, confidence_val)
             
         # Format the final predicted class dynamically for ANY plant
         if is_healthy:
