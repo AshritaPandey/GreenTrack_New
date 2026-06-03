@@ -370,13 +370,6 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         elif has_symptom_notes:
             is_healthy = False
             
-        # OOD Protection: If the RF predicts a disease but confidence is low (< 85%),
-        # AND the user didn't mention any symptoms, it is likely an out-of-distribution image (like a whole tree).
-        # We should default to healthy to prevent false alarms on healthy trees.
-        if not is_healthy and not has_symptom_notes and confidence_val < 0.85:
-            is_healthy = True
-            confidence_val = 0.85
-            
         # Format the final predicted class dynamically for ANY plant
         if is_healthy:
             predicted_class = f"healthy_{plant_type}"
