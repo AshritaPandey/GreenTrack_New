@@ -58,25 +58,29 @@ DISEASE_CLASSES = [
     "guava_rust"
 ]
 
-# 3. Load or Initialize the Model
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-weights_path = os.path.join(os.path.dirname(__file__), 'models', 'plant_disease_mobilenet.pth')
-indices_path = os.path.join(os.path.dirname(__file__), 'models', 'class_indices.json')
+import joblib
 
-if os.path.exists(weights_path) and os.path.exists(indices_path):
-    print("Loading fine-tuned custom plant disease weights from checkpoint...")
+# 3. Load or Initialize the Hybrid Model (CNN Feature Extractor + Random Forest)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+rf_path = os.path.join(os.path.dirname(__file__), 'models', 'hybrid_disease_rf.pkl')
+indices_path = os.path.join(os.path.dirname(__file__), 'models', 'hybrid_class_indices.json')
+
+# Initialize CNN Feature Extractor
+cnn_model = models.mobilenet_v2(pretrained=True)
+feature_extractor = nn.Sequential(
+    cnn_model.features,
+    nn.AdaptiveAvgPool2d(1)
+).to(device)
+feature_extractor.eval()
+rf_model = None
+
+if os.path.exists(rf_path) and os.path.exists(indices_path):
+    print("Loading Hybrid Plant Disease Classifier (CNN + RF)...")
     with open(indices_path, 'r') as f:
         class_to_idx = json.load(f)
-    # Reverse mapping to array
     idx_to_class = {v: k for k, v in class_to_idx.items()}
-    num_classes = len(class_to_idx)
-    
-    # Initialize model with exact number of trained classes
-    model = get_model(num_classes)
-    model.load_state_dict(torch.load(weights_path, map_location=device))
-    
-    # Override standard list with the specifically trained ones
-    DISEASE_CLASSES = [idx_to_class[i] for i in range(num_classes)]
+    DISEASE_CLASSES = [idx_to_class[i] for i in range(len(idx_to_class))]
+    rf_model = joblib.load(rf_path)
 else:
     print("Fine-tuned checkpoint not found. Performing Transfer-Mapped Calibration...")
     model = PlantDiseaseClassifier(num_classes=len(DISEASE_CLASSES))
@@ -300,22 +304,35 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         input_tensor = preprocess(img)
         input_batch = input_tensor.unsqueeze(0).to(device)
 
-        # 1. Run standard CNN inference
+        # 1. Run HYBRID CNN + RF inference
         with torch.no_grad():
-            output = model(input_batch)
+            features = feature_extractor(input_batch)
+            features = features.view(features.size(0), -1).cpu().numpy()
             
-        probabilities = torch.nn.functional.softmax(output[0], dim=0)
-        sorted_probs, sorted_indices = torch.sort(probabilities, descending=True)
+        # Get probabilities from Random Forest
+        rf_probs = rf_model.predict_proba(features)[0]
         
         plant_type = plant.lower()
-        predicted_class = None
-        confidence_val = 0.0
         
-        # 1. Take the top CNN prediction directly without restricting by dropdown choice
-        raw_prediction = DISEASE_CLASSES[sorted_indices[0].item()]
-        confidence_val = float(sorted_probs[0].item())
-            
-        # HYBRID MODEL LOGIC: Convert the specific prediction into a general Binary Health check
+        # Sort indices by probability
+        import numpy as np
+        sorted_indices = np.argsort(rf_probs)[::-1]
+        
+        # Get absolute top prediction
+        raw_prediction = DISEASE_CLASSES[sorted_indices[0]]
+        confidence_val = float(rf_probs[sorted_indices[0]])
+        
+        # HYBRID LOGIC 1: Enforce plant-specific disease IF the plant is known in our dataset
+        known_plant_in_dataset = any(plant_type in c.lower() for c in DISEASE_CLASSES)
+        if known_plant_in_dataset:
+            for idx in sorted_indices:
+                class_name = DISEASE_CLASSES[idx]
+                if plant_type in class_name or "general" in class_name:
+                    raw_prediction = class_name
+                    confidence_val = float(rf_probs[idx])
+                    break
+                    
+        # HYBRID LOGIC 2: Convert the specific prediction into a general Binary Health check
         is_healthy = "healthy" in raw_prediction.lower() or "optimal" in raw_prediction.lower()
         
         # 2. ADVANCED MULTIMODAL NLP CALIBRATION
