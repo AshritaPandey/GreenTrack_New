@@ -82,38 +82,8 @@ if os.path.exists(rf_path) and os.path.exists(indices_path):
     DISEASE_CLASSES = [idx_to_class[i] for i in range(len(idx_to_class))]
     rf_model = joblib.load(rf_path)
 else:
-    print("Fine-tuned checkpoint not found. Performing Transfer-Mapped Calibration...")
-    model = PlantDiseaseClassifier(num_classes=len(DISEASE_CLASSES))
-    try:
-        base_mobilenet = models.mobilenet_v2(pretrained=True)
-        imagenet_fc = base_mobilenet.classifier[1]
-        
-        insect_weights = imagenet_fc.weight[300]
-        fungus_weights = imagenet_fc.weight[947]
-        healthy_weights = imagenet_fc.weight[948]
-        
-        insect_bias = imagenet_fc.bias[300]
-        fungus_bias = imagenet_fc.bias[947]
-        healthy_bias = imagenet_fc.bias[948]
+    print("Hybrid checkpoint not found. Please train the hybrid model first.")
 
-        with torch.no_grad():
-            custom_fc = model.backbone.classifier[4]
-            for idx, name in enumerate(DISEASE_CLASSES):
-                if "healthy" in name:
-                    custom_fc.weight[idx] = healthy_weights[:512]
-                    custom_fc.bias[idx] = healthy_bias
-                elif "gall_midge" in name or "borer" in name or "pest" in name:
-                    custom_fc.weight[idx] = insect_weights[:512]
-                    custom_fc.bias[idx] = insect_bias
-                elif "anthracnose" in name or "blight" in name or "fungal" in name:
-                    custom_fc.weight[idx] = fungus_weights[:512]
-                    custom_fc.bias[idx] = fungus_bias
-        print("Zero-Shot Transfer Calibration Complete. AI Pipeline ready!")
-    except Exception as e:
-        print(f"Calibration notice: {e}")
-
-model.to(device)
-model.eval()
 
 import numpy as np
 
