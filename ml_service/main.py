@@ -118,6 +118,28 @@ class CropToLeaf(object):
         pad_x = int((x1 - x0) * 0.2)
         return img.crop((max(0, x0 - pad_x), max(0, y0 - pad_y), min(w, x1 + pad_x), min(h, y1 + pad_y)))
 
+def is_plant_image(img):
+    """
+    Checks if the image contains a minimum threshold of plant/soil colors (greens, browns, yellows).
+    Rejects screenshots, white documents, etc.
+    """
+    small_img = img.copy()
+    small_img.thumbnail((300, 300))
+    img_hsv = small_img.convert('HSV')
+    np_img = np.array(img_hsv)
+    
+    H = np_img[:, :, 0]
+    S = np_img[:, :, 1]
+    V = np_img[:, :, 2]
+    
+    # Valid hues: ~10 (brown/red) to ~150 (green/cyan)
+    # Saturation and Value > 30 to exclude greyscale/white/black
+    valid_mask = (H > 10) & (H < 150) & (S > 30) & (V > 30)
+    ratio = np.sum(valid_mask) / (small_img.size[0] * small_img.size[1])
+    
+    return ratio > 0.05
+
+
 # 4. Image Preprocessing Pipelines
 preprocess = transforms.Compose([
     CropToLeaf(),
@@ -264,12 +286,22 @@ import requests
 async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_url: str = Form(None), image_path: str = Form(None)):
     try:
         if image_url:
-            response = requests.get(image_url)
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            response = requests.get(image_url, headers=headers)
             img = Image.open(io.BytesIO(response.content)).convert('RGB')
         elif image_path:
             img = Image.open(image_path).convert('RGB')
         else:
             raise HTTPException(status_code=400, detail="Local image_path or image_url required")
+            
+        if not is_plant_image(img):
+            return {
+                "health_status": "❌ Invalid Image",
+                "issue_identified": "No plant or soil detected",
+                "confidence": "100%",
+                "solution_steps": ["Please provide a clear image of a plant, leaf, tree, or soil."],
+                "highlight_area": {"x": 0, "y": 0, "w": 0, "h": 0}
+            }
             
         input_tensor = preprocess(img)
         input_batch = input_tensor.unsqueeze(0).to(device)
@@ -331,12 +363,19 @@ async def predict_disease(plant: str = Form(...), notes: str = Form(""), image_u
         
         if is_early_stage and not has_symptom_notes:
             is_healthy = True
-            confidence_val = 0.99
+            confidence_val = max(0.95, confidence_val)
         elif has_healthy_notes and not has_symptom_notes:
             is_healthy = True
-            confidence_val = 0.99
+            confidence_val = max(0.95, confidence_val)
         elif has_symptom_notes:
             is_healthy = False
+            
+        # OOD Protection: If the RF predicts a disease but confidence is low (< 85%),
+        # AND the user didn't mention any symptoms, it is likely an out-of-distribution image (like a whole tree).
+        # We should default to healthy to prevent false alarms on healthy trees.
+        if not is_healthy and not has_symptom_notes and confidence_val < 0.85:
+            is_healthy = True
+            confidence_val = 0.85
             
         # Format the final predicted class dynamically for ANY plant
         if is_healthy:
