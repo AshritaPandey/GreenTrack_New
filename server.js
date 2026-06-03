@@ -258,7 +258,7 @@ app.post("/api/analyze-health", async (req, res) => {
         }
     }
 
-    const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
+    const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "https://greentrack-ai-v2.onrender.com";
     const response = await fetch(`${ML_SERVICE_URL}/predict-disease`, {
       method: "POST",
       body: formData
@@ -275,7 +275,10 @@ app.post("/api/recommend", async (req, res) => {
   const { month, current_temp, soil_type, area, rain_prob, nutrients } = req.body;
   
   try {
-    const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
+    const MONGODB_URI = process.env.MONGODB_URI;
+    const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+    // Force connection to live AI engine if not running locally with explicit env var
+    const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "https://greentrack-ai-v2.onrender.com";
     const response = await fetch(`${ML_SERVICE_URL}/recommend-plant`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

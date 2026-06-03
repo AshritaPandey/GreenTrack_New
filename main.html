@@ -301,12 +301,13 @@
           navigator.geolocation.getCurrentPosition(async (pos) => {
             const { latitude, longitude } = pos.coords;
             try {
-              const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+              const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`);
               const geoData = await geoRes.json();
               const addr = geoData.address;
-              const area = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || addr.town || addr.city || "Chennai";
-              areaName.innerText = area;
-              statusText.textContent = `📍 Area Identified: ${area}`;
+              let rawArea = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || addr.town || addr.city || "Chennai Area";
+              rawArea = rawArea.replace(/^(Zone\s+\d+\s*|Ward\s+\d+\s*)/i, '').trim();
+              areaName.innerText = rawArea;
+              statusText.textContent = `📍 Area Identified: ${rawArea}`;
 
               const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=precipitation_probability`);
               const weatherData = await weatherRes.json();
