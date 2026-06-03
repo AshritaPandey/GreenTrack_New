@@ -307,8 +307,13 @@
             const geoData = await geoRes.json();
             const addr = geoData.address;
             
-            let rawArea = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || "Chennai Area";
-            rawArea = rawArea.replace(/^(Zone\s+\d+\s*|Ward\s+\d+\s*)/i, '').trim();
+            let rawArea = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || "";
+            const city = addr.city || addr.town || addr.county || addr.state_district || "India";
+            if (!rawArea) {
+                rawArea = city;
+            } else if (!rawArea.includes(city)) {
+                rawArea = rawArea + ", " + city;
+            }
             areaSpan.innerText = rawArea;
 
             const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=precipitation_probability`);

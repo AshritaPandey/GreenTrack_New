@@ -307,8 +307,14 @@
               const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`);
               const geoData = await geoRes.json();
               const addr = geoData.address;
-              let rawArea = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || addr.town || addr.city || "Chennai Area";
-              rawArea = rawArea.replace(/^(Zone\s+\d+\s*|Ward\s+\d+\s*)/i, '').trim();
+              let rawArea = addr.suburb || addr.neighbourhood || addr.residential || addr.city_district || "";
+              // Don't strip Ward/Zone, just keep it, but add city!
+              const city = addr.city || addr.town || addr.county || addr.state_district || "India";
+              if (!rawArea) {
+                  rawArea = city;
+              } else if (!rawArea.includes(city)) {
+                  rawArea = rawArea + ", " + city;
+              }
               areaName.innerText = rawArea;
               statusText.textContent = `📍 Area Identified: ${rawArea}`;
 
